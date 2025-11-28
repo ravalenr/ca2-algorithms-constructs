@@ -122,7 +122,10 @@ public class SchoolManagementSystem {
                 case GENERATE_RANDOM:
                     handleGenerateRandomEmployees();
                     break;
-                case CREATE_BINARY_TREE:
+                case DISPLAY_ALL:
+                    handleDisplayAllEmployees();
+                    break;
+                case DISPLAY_HIERARCHY:
                     handleDisplayHierarchy();
                     break;
                 case EXIT:
@@ -341,6 +344,22 @@ public class SchoolManagementSystem {
      * This method ensures each department has at least one manager
      */
     private void createManagersForDepartments() {
+        // School-appropriate names for managers
+        String[] principalFirstNames = {"Robert", "Margaret", "William"};
+        String[] principalLastNames = {"Thompson", "Richardson", "Patterson"};
+
+        String[] vpFirstNames = {"Jennifer", "Michael", "Elizabeth"};
+        String[] vpLastNames = {"Collins", "Murphy", "Stewart"};
+
+        String[] headFirstNames = {"James", "Mary", "Thomas", "Patricia", "Charles",
+                                  "Linda", "Christopher", "Barbara", "Daniel", "Susan"};
+        String[] headLastNames = {"Kelly", "Rogers", "Reed", "Cook", "Morgan",
+                                 "Bell", "Ward", "Cox", "Hughes", "Sanders"};
+
+        int principalIndex = 0;
+        int vpIndex = 0;
+        int headIndex = 0;
+
         // Array of manager types to assign
         ManagerType[] managerTypes = {
             ManagerType.PRINCIPAL,
@@ -361,17 +380,30 @@ public class SchoolManagementSystem {
             String deptName = dept.getDepartmentName();
 
             if (managerType == ManagerType.PRINCIPAL) {
-                manager = new Principal("John", "Principal", "Male",
-                        "principal@school.com", 85000.0, "senior",
-                        "Principal", "School");
+                String firstName = principalFirstNames[principalIndex % principalFirstNames.length];
+                String lastName = principalLastNames[principalIndex % principalLastNames.length];
+                principalIndex++;
+
+                manager = new Principal(firstName, lastName, "Male",
+                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
+                        85000.0, "senior", "Principal", "School");
             } else if (managerType == ManagerType.VICE_PRINCIPAL) {
-                manager = new VicePrincipal("Sarah", "VicePrincipal", "Female",
-                        "viceprincipal@school.com", 75000.0, "senior",
-                        "Vice Principal", "School");
+                String firstName = vpFirstNames[vpIndex % vpFirstNames.length];
+                String lastName = vpLastNames[vpIndex % vpLastNames.length];
+                vpIndex++;
+
+                manager = new VicePrincipal(firstName, lastName, "Female",
+                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
+                        75000.0, "senior", "Vice Principal", "School");
             } else {
-                manager = new DepartmentHead("Manager", deptName, "Male",
-                        "head." + deptName.toLowerCase() + "@school.com", 65000.0, "senior",
-                        "Department Head", "School");
+                // Department Head - use proper names
+                String firstName = headFirstNames[headIndex % headFirstNames.length];
+                String lastName = headLastNames[headIndex % headLastNames.length];
+                headIndex++;
+
+                manager = new DepartmentHead(firstName, lastName, "Male",
+                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
+                        65000.0, "senior", "Department Head of " + deptName, "School");
             }
 
             // Assign department to manager
@@ -434,10 +466,11 @@ public class SchoolManagementSystem {
      * Handles the Sort Employees menu option
      * Sorts all employees alphabetically by name and displays the first 20
      *
-     * This method demonstrates the use of Binary Tree Sort algorithm:
-     * 1. Converts ArrayList to array
-     * 2. Calls SortingAlgorithms.sortAndDisplayFirst() which uses Binary Tree Sort
-     * 3. Displays the first 20 sorted employees with their details
+     * This method demonstrates the use of Merge Sort algorithm:
+     * 1. Asks user to choose sort order (Last Name or First Name)
+     * 2. Converts ArrayList to array
+     * 3. Calls appropriate SortingAlgorithms method which uses Merge Sort
+     * 4. Displays the first 20 sorted employees with their details
      */
     private void handleSortEmployees() {
         System.out.println("\n>>> SORT option selected");
@@ -449,12 +482,25 @@ public class SchoolManagementSystem {
             return;
         }
 
+        // Ask user how they want to sort
+        System.out.println("\nHow would you like to sort employees?");
+        System.out.println("1. By Last Name (e.g., Anderson, Brown, Clark...)");
+        System.out.println("2. By First Name (e.g., Benjamin, Charles, Daniel...)");
+        System.out.print("Enter your choice (1 or 2): ");
+
+        int sortChoice = getUserMenuChoice();
+
         // Convert ArrayList to array for the sorting algorithm
         Employee[] employeeArray = employeeList.toArray(new Employee[0]);
 
-        // Use the SortingAlgorithms class to sort and display
-        // This uses Binary Tree Sort (recursive) internally
-        SortingAlgorithms.sortAndDisplayFirst(employeeArray, 20);
+        // Use the appropriate sorting method based on user choice
+        if (sortChoice == 2) {
+            // Sort by FIRST NAME
+            SortingAlgorithms.sortByFirstNameAndDisplayFirst(employeeArray, 20);
+        } else {
+            // Sort by LAST NAME (default)
+            SortingAlgorithms.sortAndDisplayFirst(employeeArray, 20);
+        }
     }
 
     /**
@@ -479,10 +525,10 @@ public class SchoolManagementSystem {
 
         // Binary Search requires sorted data, so sort the array first
         Employee[] employeeArray = employeeList.toArray(new Employee[0]);
-        Employee[] sortedArray = SortingAlgorithms.binaryTreeSort(employeeArray);
+        Employee[] sortedArray = SortingAlgorithms.mergeSort(employeeArray);
 
         // Prompt user for search term
-        System.out.print("Enter employee name to search: ");
+        System.out.print("Enter employee name to search (Last name or Full name): ");
         String searchName = scanner.nextLine().trim();
 
         // Validate input
@@ -551,25 +597,6 @@ public class SchoolManagementSystem {
         System.out.print("Enter job title: ");
         String jobTitle = scanner.nextLine().trim();
 
-        // Display and select Manager Type using the ManagerType enum
-        System.out.println("\nSelect Manager Type:");
-        ManagerType[] managerTypes = ManagerType.values();
-        for (int i = 0; i < managerTypes.length; i++) {
-            System.out.println((i + 1) + ". " + managerTypes[i].getDisplayName());
-        }
-
-        System.out.print("Enter your choice (1-" + managerTypes.length + "): ");
-        int managerChoice = getUserMenuChoice();
-
-        // Validate manager type selection
-        ManagerType selectedManagerType = null;
-        if (managerChoice >= 1 && managerChoice <= managerTypes.length) {
-            selectedManagerType = managerTypes[managerChoice - 1];
-        } else {
-            System.out.println("Invalid choice. Using default Manager type.");
-            selectedManagerType = ManagerType.MANAGER;
-        }
-
         // Display and select Department using the DepartmentType enum
         System.out.println("\nSelect Department:");
         DepartmentType[] departmentTypes = DepartmentType.values();
@@ -598,8 +625,8 @@ public class SchoolManagementSystem {
         newEmployee.setDepartment(dept);
         dept.addStaff(newEmployee);
 
-        // Find or create manager with selected manager type and assign
-        Manager assignedManager = findOrCreateManager(selectedManagerType, dept);
+        // Find an appropriate manager for this department
+        Manager assignedManager = findManagerForEmployee(newEmployee);
         if (assignedManager != null) {
             assignedManager.addEmployee(newEmployee);
         }
@@ -613,10 +640,14 @@ public class SchoolManagementSystem {
         System.out.println("\"" + newEmployee.getFullName() + "\" has been added as");
         System.out.println("\"" + jobTitle + "\" to \"" + dept.getDepartmentName() + "\" successfully!");
         System.out.println();
-        System.out.println("Manager Type: " + selectedManagerType.getDisplayName());
         System.out.println("Assigned Manager: " +
-                (assignedManager != null ? assignedManager.getFullName() : "None"));
+                (assignedManager != null ? assignedManager.getFullName() + " (" +
+                assignedManager.getManagerTypeString() + ")" : "None"));
         System.out.println("========================================\n");
+
+        // Display the newly added employee details
+        System.out.println("Employee has been added to the system:");
+        newEmployee.displayInfo();
     }
 
     /**
@@ -637,22 +668,30 @@ public class SchoolManagementSystem {
             }
         }
 
-        // No existing manager found, create a new one
+        // No existing manager found, create a new one with a proper name
         Manager newManager = null;
+
+        // Generate a unique manager based on count to avoid name collisions
+        int managerCount = managerList.size() + 1;
+        String[] firstNames = {"Alexander", "Victoria", "Benjamin", "Catherine", "Nicholas"};
+        String[] lastNames = {"Wright", "Scott", "Green", "Adams", "Baker"};
+
+        String firstName = firstNames[managerCount % firstNames.length];
+        String lastName = lastNames[managerCount % lastNames.length];
 
         // Create appropriate Manager subclass based on type
         if (managerType == ManagerType.PRINCIPAL) {
-            newManager = new Principal("Principal", "Manager", "Male",
-                    "principal@school.com", 80000.0, "senior",
-                    "Principal", "School");
+            newManager = new Principal(firstName, lastName, "Male",
+                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
+                    80000.0, "senior", "Principal", "School");
         } else if (managerType == ManagerType.VICE_PRINCIPAL) {
-            newManager = new VicePrincipal("Vice", "Principal", "Female",
-                    "vice@school.com", 70000.0, "senior",
-                    "Vice Principal", "School");
+            newManager = new VicePrincipal(firstName, lastName, "Female",
+                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
+                    70000.0, "senior", "Vice Principal", "School");
         } else {
-            newManager = new DepartmentHead("Head", department.getDepartmentName(), "Male",
-                    "head@school.com", 60000.0, "senior",
-                    "Department Head", "School");
+            newManager = new DepartmentHead(firstName, lastName, "Male",
+                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
+                    60000.0, "senior", "Department Head of " + department.getDepartmentName(), "School");
         }
 
         // Assign department to manager
@@ -777,8 +816,18 @@ public class SchoolManagementSystem {
     }
 
     /**
+     * Handles the Display All Employees menu option
+     * Displays all employees currently in the system sorted alphabetically
+     */
+    private void handleDisplayAllEmployees() {
+        System.out.println("\n>>> DISPLAY ALL EMPLOYEES option selected");
+        displayAllEmployees();
+    }
+
+    /**
      * Displays all employees currently in the system
      * Shows employee name, job title, department, and assigned manager
+     * Employees are displayed in alphabetical order by last name
      */
     private void displayAllEmployees() {
         if (employeeList.isEmpty()) {
@@ -786,13 +835,18 @@ public class SchoolManagementSystem {
             return;
         }
 
+        // Sort employees before displaying
+        Employee[] employeeArray = employeeList.toArray(new Employee[0]);
+        Employee[] sortedEmployees = SortingAlgorithms.mergeSort(employeeArray);
+
         System.out.println("========================================");
-        System.out.println("ALL EMPLOYEES (" + employeeList.size() + " total)");
+        System.out.println("ALL EMPLOYEES (" + sortedEmployees.length + " total)");
+        System.out.println("Sorted alphabetically by last name");
         System.out.println("========================================");
 
         // Display each employee with their details
-        for (int i = 0; i < employeeList.size(); i++) {
-            Employee emp = employeeList.get(i);
+        for (int i = 0; i < sortedEmployees.length; i++) {
+            Employee emp = sortedEmployees[i];
             System.out.println((i + 1) + ". " + emp.getFullName() +
                     " - " + emp.getJobTitle() +
                     " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")");
@@ -803,15 +857,15 @@ public class SchoolManagementSystem {
 
     /**
      * Handles the Display Employee Hierarchy menu option
-     * Provides information about the binary tree structure used for sorting
+     * Displays the organizational hierarchy showing managers and their departments
      *
-     * This method explains:
-     * 1. How the Binary Search Tree is used in the sorting process
-     * 2. The recursive nature of insertion and traversal
+     * This method shows:
+     * 1. The organizational structure of the school
+     * 2. Managers and their assigned departments
      * 3. Current system statistics
      */
     private void handleDisplayHierarchy() {
-        System.out.println("\n>>> DISPLAY EMPLOYEE HIERARCHY option selected");
+        System.out.println("\n>>> DISPLAY ORGANIZATIONAL HIERARCHY option selected");
 
         // Validate that we have employees to display information about
         if (employeeList.isEmpty()) {
@@ -820,24 +874,28 @@ public class SchoolManagementSystem {
             return;
         }
 
-        // Display information about the binary tree structure
+        // Display organizational hierarchy
         System.out.println("========================================");
-        System.out.println("EMPLOYEE HIERARCHY INFORMATION");
+        System.out.println("SCHOOL ORGANIZATIONAL HIERARCHY");
         System.out.println("========================================");
         System.out.println();
-        System.out.println("This system uses a Binary Search Tree (BST)");
-        System.out.println("structure for sorting employees alphabetically");
-        System.out.println("by name.");
-        System.out.println();
-        System.out.println("When you select the SORT option:");
-        System.out.println("1. Each employee is inserted into a BST using");
-        System.out.println("   recursive insertion based on name comparison");
-        System.out.println("2. The tree is then traversed in-order");
-        System.out.println("   (left-root-right) recursively");
-        System.out.println("3. This in-order traversal produces a sorted");
-        System.out.println("   sequence of employees");
-        System.out.println();
-        System.out.println("Current System Statistics:");
+        System.out.println("MANAGEMENT STRUCTURE:");
+        System.out.println("----------------------------------------");
+
+        // Display managers by type
+        for (Manager manager : managerList) {
+            System.out.println(manager.getManagerTypeString() + ": " +
+                             manager.getFullName());
+            System.out.println("  Department: " +
+                             (manager.getDepartment() != null ?
+                              manager.getDepartment().getDepartmentName() : "Not assigned"));
+            System.out.println("  Employees Managed: " + manager.getEmployeeCount());
+            System.out.println();
+        }
+
+        System.out.println("========================================");
+        System.out.println("SYSTEM STATISTICS:");
+        System.out.println("----------------------------------------");
         System.out.println("Total employees: " + employeeList.size());
         System.out.println("Total managers: " + managerList.size());
         System.out.println("Total departments: " + departmentList.size());

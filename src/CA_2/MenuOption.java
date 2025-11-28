@@ -17,8 +17,9 @@ public enum MenuOption {
     SEARCH(2, "Search Employee", "Search for an employee and view their details"),
     ADD_RECORDS(3, "Add New Employee", "Add a new employee record to the system"),
     GENERATE_RANDOM(4, "Generate Random Employees", "Generate random employee records for testing"),
-    CREATE_BINARY_TREE(5, "Display Employee Hierarchy", "View employee hierarchy as binary tree"),
-    EXIT(6, "Exit", "Exit the application");
+    DISPLAY_ALL(5, "Display All Employees", "View all employees in the system"),
+    DISPLAY_HIERARCHY(6, "Display Organizational Hierarchy", "View school organizational structure and statistics"),
+    EXIT(7, "Exit", "Exit the application");
 
     // Instance variables
     private final int optionNumber;

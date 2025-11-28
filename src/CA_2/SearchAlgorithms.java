@@ -28,7 +28,12 @@ public class SearchAlgorithms {
      * This is the main public method for searching employees
      *
      * The employee array MUST be sorted before calling this method
-     * Use SortingAlgorithms.binaryTreeSort() to sort the array first
+     * Use SortingAlgorithms.mergeSort() to sort the array first
+     *
+     * Accepts input in multiple formats:
+     * - "Fisher" (last name only)
+     * - "Isla Fisher" (first name last name)
+     * - "Fisher Isla" (last name first name)
      *
      * @param employees  Sorted array of Employee objects
      * @param searchName Full name to search for (case-insensitive)
@@ -40,11 +45,50 @@ public class SearchAlgorithms {
             return null;
         }
 
-        // Normalize search name for case-insensitive comparison
-        String normalizedSearchName = searchName.trim().toLowerCase();
+        // Parse and normalize the search name
+        String normalizedSearchName = parseAndNormalizeSearchName(searchName);
 
         // Perform binary search
         return binarySearchRecursive(employees, normalizedSearchName, 0, employees.length - 1);
+    }
+
+    /**
+     * Parses the user's search input and normalizes it to match array sort order.
+     * Handles multiple input formats:
+     * - "Fisher" → "fisher" (last name only - will match partial)
+     * - "Isla Fisher" → "fisher isla" (rearranged to lastName firstName)
+     * - "Fisher Isla" → "fisher isla" (already in correct order)
+     *
+     * @param searchName The raw search input from user
+     * @return Normalized search string in "lastName firstName" format
+     */
+    private static String parseAndNormalizeSearchName(String searchName) {
+        if (searchName == null || searchName.trim().isEmpty()) {
+            return "";
+        }
+
+        // Trim and convert to lowercase
+        String normalized = searchName.trim().toLowerCase();
+
+        // Split by whitespace
+        String[] parts = normalized.split("\\s+");
+
+        if (parts.length == 1) {
+            // Single word - could be first name or last name
+            // Return as-is for partial matching
+            return parts[0];
+        } else if (parts.length == 2) {
+            // Two words - assume "firstName lastName" and rearrange to "lastName firstName"
+            // This matches how the array is sorted
+            String possibleFirstName = parts[0];
+            String possibleLastName = parts[1];
+
+            // Return in "lastName firstName" format to match sort order
+            return possibleLastName + " " + possibleFirstName;
+        } else {
+            // More than 2 words - just join them
+            return normalized;
+        }
     }
 
     /**
@@ -274,10 +318,11 @@ public class SearchAlgorithms {
 
     /**
      * Helper method to get normalized full name from an employee
-     * Returns full name in lowercase for case-insensitive comparison
+     * Returns full name in LAST NAME, FIRST NAME format (matching sort order)
+     * This is critical for binary search to work correctly!
      *
      * @param employee Employee object
-     * @return Normalized full name (lowercase, trimmed)
+     * @return Normalized full name as "lastname firstname" (lowercase, trimmed)
      */
     private static String getFullNameNormalized(Employee employee) {
         if (employee == null) {
@@ -287,7 +332,9 @@ public class SearchAlgorithms {
         String firstName = employee.getFirstName() != null ? employee.getFirstName() : "";
         String lastName = employee.getLastName() != null ? employee.getLastName() : "";
 
-        return (firstName + " " + lastName).trim().toLowerCase();
+        // CRITICAL: Return "lastName firstName" to match the sort order!
+        // The sort compares by last name first, then first name
+        return (lastName + " " + firstName).trim().toLowerCase();
     }
 
     /**
