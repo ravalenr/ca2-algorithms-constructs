@@ -273,9 +273,20 @@ public class SortingAlgorithms {
         // Sort the employees using Merge Sort
         Employee[] sortedEmployees = mergeSort(employees);
 
+        // Count randomly generated employees
+        int randomCount = 0;
+        for (Employee emp : sortedEmployees) {
+            if (emp.isRandomlyGenerated()) {
+                randomCount++;
+            }
+        }
+
         // Display header with formatting
         System.out.println("\n========================================");
         System.out.println("SORTED EMPLOYEE LIST (First " + displayCount + ")");
+        if (randomCount > 0) {
+            System.out.println("Total Randomly Generated: " + randomCount);
+        }
         System.out.println("========================================");
 
         // Determine how many employees to display
@@ -286,10 +297,14 @@ public class SortingAlgorithms {
         for (int i = 0; i < countToDisplay; i++) {
             Employee emp = sortedEmployees[i];
 
+            // Add [RANDOM] tag for randomly generated employees
+            String randomTag = emp.isRandomlyGenerated() ? " [RANDOM]" : "";
+
             // Format: "1. John Smith - Teacher (Mathematics Department)"
             System.out.println((i + 1) + ". " + emp.getFullName() +
                     " - " + emp.getJobTitle() +
-                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")");
+                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")" +
+                    randomTag);
         }
 
         // Display footer with statistics
@@ -516,10 +531,21 @@ public class SortingAlgorithms {
         // Sort the employees by first name using Merge Sort
         Employee[] sortedEmployees = mergeSortByFirstName(employees);
 
+        // Count randomly generated employees
+        int randomCount = 0;
+        for (Employee emp : sortedEmployees) {
+            if (emp.isRandomlyGenerated()) {
+                randomCount++;
+            }
+        }
+
         // Display header with formatting
         System.out.println("\n========================================");
         System.out.println("SORTED EMPLOYEE LIST (First " + displayCount + ")");
         System.out.println("Sorted by FIRST NAME");
+        if (randomCount > 0) {
+            System.out.println("Total Randomly Generated: " + randomCount);
+        }
         System.out.println("========================================");
 
         // Determine how many employees to display
@@ -529,9 +555,13 @@ public class SortingAlgorithms {
         for (int i = 0; i < countToDisplay; i++) {
             Employee emp = sortedEmployees[i];
 
+            // Add [RANDOM] tag for randomly generated employees
+            String randomTag = emp.isRandomlyGenerated() ? " [RANDOM]" : "";
+
             System.out.println((i + 1) + ". " + emp.getFullName() +
                     " - " + emp.getJobTitle() +
-                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")");
+                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")" +
+                    randomTag);
         }
 
         // Display footer with statistics

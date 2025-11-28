@@ -24,6 +24,7 @@ public class Employee {
     protected String company;
     protected Manager manager;
     protected Department department;
+    protected boolean isRandomlyGenerated; // Flag to track if employee was randomly generated
 
     /**
      * Default constructor
@@ -41,6 +42,7 @@ public class Employee {
         this.company = "";
         this.manager = null;
         this.department = null;
+        this.isRandomlyGenerated = false;
     }
 
     /**
@@ -69,6 +71,7 @@ public class Employee {
         this.company = company;
         this.manager = null;
         this.department = null;
+        this.isRandomlyGenerated = false;
     }
 
     /**
@@ -275,6 +278,22 @@ public class Employee {
      */
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    /**
+     * Returns whether this employee was randomly generated
+     * @return true if randomly generated, false otherwise
+     */
+    public boolean isRandomlyGenerated() {
+        return isRandomlyGenerated;
+    }
+
+    /**
+     * Marks this employee as randomly generated
+     * @param isRandomlyGenerated true if employee was randomly generated
+     */
+    public void setRandomlyGenerated(boolean isRandomlyGenerated) {
+        this.isRandomlyGenerated = isRandomlyGenerated;
     }
 
     /**

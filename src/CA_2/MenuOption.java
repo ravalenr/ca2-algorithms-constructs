@@ -19,7 +19,8 @@ public enum MenuOption {
     GENERATE_RANDOM(4, "Generate Random Employees", "Generate random employee records for testing"),
     DISPLAY_ALL(5, "Display All Employees", "View all employees in the system"),
     DISPLAY_HIERARCHY(6, "Display Organizational Hierarchy", "View school organizational structure and statistics"),
-    EXIT(7, "Exit", "Exit the application");
+    CHANGE_FILE(7, "Change Data File", "Load employees from a different data file"),
+    EXIT(8, "Exit", "Exit the application");
 
     // Instance variables
     private final int optionNumber;

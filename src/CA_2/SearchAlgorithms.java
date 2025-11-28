@@ -2,21 +2,23 @@ package CA_2;
 
 /**
  * SearchAlgorithms class provides searching functionality for employee records.
- * This class implements Binary Search algorithm for efficient employee lookup.
+ * This class implements flexible search with partial name matching for user-friendly lookup.
  *
- * Design Decision: Binary Search was chosen because it provides O(log n) search
- * time
- * on sorted data, which is significantly faster than linear search O(n) for
- * large datasets.
- * Since we sort the employee list using Binary Tree Sort, Binary Search is the
- * natural
- * and most efficient choice for searching.
+ * Design Decision: Linear search with partial matching was chosen to provide
+ * a better user experience. Users can search by partial names (first name, last name,
+ * or any part of the full name) without needing exact matches.
  *
  * Algorithm Justification:
- * - Binary Search has O(log n) time complexity for sorted arrays
- * - Requires sorted data (provided by Binary Tree Sort)
- * - Efficient for repeated searches on the same dataset
- * - <1 second search time
+ * - Linear search with contains() matching: O(n) time complexity
+ * - Case-insensitive matching for user convenience
+ * - No requirement for sorted data
+ * - Flexible partial matching (search "buff" finds "Buffy Summers")
+ * - Fast enough for typical school staff sizes (50-500 employees)
+ * - <1 second search time for datasets under 1000 employees
+ *
+ * Trade-off: We sacrifice the O(log n) speed of binary search for the flexibility
+ * of partial matching. For a school management system with typically 50-500 staff,
+ * this is an acceptable trade-off for much better usability.
  *
  * @author Rafael Valentim Ribeiro
  * @version 1.0
@@ -24,19 +26,22 @@ package CA_2;
 public class SearchAlgorithms {
 
     /**
-     * Searches for an employee by full name using Binary Search algorithm
+     * Searches for an employee by name using flexible partial matching
      * This is the main public method for searching employees
      *
-     * The employee array MUST be sorted before calling this method
-     * Use SortingAlgorithms.mergeSort() to sort the array first
+     * Search behavior:
+     * - Searches both first name and last name
+     * - Case-insensitive matching
+     * - Partial matching (contains logic)
+     * - Returns first match found
      *
-     * Accepts input in multiple formats:
-     * - "Fisher" (last name only)
-     * - "Isla Fisher" (first name last name)
-     * - "Fisher Isla" (last name first name)
+     * Examples:
+     * - "Fisher" → matches anyone with "Fisher" in first or last name
+     * - "Isla" → matches "Isla Fisher"
+     * - "buffy" → matches "Buffy Summers"
      *
-     * @param employees  Sorted array of Employee objects
-     * @param searchName Full name to search for (case-insensitive)
+     * @param employees  Array of Employee objects (does not need to be sorted)
+     * @param searchName Name or partial name to search for (case-insensitive)
      * @return Employee object if found, null if not found
      */
     public static Employee binarySearch(Employee[] employees, String searchName) {
@@ -45,11 +50,32 @@ public class SearchAlgorithms {
             return null;
         }
 
-        // Parse and normalize the search name
-        String normalizedSearchName = parseAndNormalizeSearchName(searchName);
+        // Normalize search term to lowercase
+        String searchTerm = searchName.trim().toLowerCase();
 
-        // Perform binary search
-        return binarySearchRecursive(employees, normalizedSearchName, 0, employees.length - 1);
+        // Linear search with contains matching
+        for (int i = 0; i < employees.length; i++) {
+            Employee emp = employees[i];
+
+            if (emp == null) {
+                continue;
+            }
+
+            // Get first and last name (null-safe)
+            String firstName = emp.getFirstName() != null ? emp.getFirstName().toLowerCase() : "";
+            String lastName = emp.getLastName() != null ? emp.getLastName().toLowerCase() : "";
+            String fullName = (firstName + " " + lastName).trim();
+
+            // Check if search term is contained in first name, last name, or full name
+            if (firstName.contains(searchTerm) ||
+                lastName.contains(searchTerm) ||
+                fullName.contains(searchTerm)) {
+                return emp;
+            }
+        }
+
+        // Not found
+        return null;
     }
 
     /**

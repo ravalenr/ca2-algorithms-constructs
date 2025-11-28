@@ -11,15 +11,13 @@ package CA_2;
  * @version 1.0
  */
 public enum ManagerType {
-    // Enum constants representing different manager types
-    PRINCIPAL("Principal", "School Principal - Overall school leadership"),
-    VICE_PRINCIPAL("Vice Principal", "Vice Principal - Assists principal, handles discipline and events"),
-    DEPARTMENT_HEAD("Department Head", "Department Head - Manages specific department and curriculum"),
-    HEAD_MANAGER("Head Manager", "Head Manager - Senior leadership position"),
-    SENIOR_MANAGER("Senior Manager", "Senior Manager - Experienced management role"),
-    MANAGER("Manager", "Manager - Standard management position"),
-    ASSISTANT_MANAGER("Assistant Manager", "Assistant Manager - Assists senior managers"),
-    TEAM_LEAD("Team Lead", "Team Lead - Leads a specific team or project");
+    // Enum constants representing different manager types in a school context
+    PRINCIPAL("Principal", "School Principal - Overall school leadership and administration"),
+    DEPUTY_PRINCIPAL("DeputyPrincipal", "Deputy Principal/Vice Principal - Assists principal, student discipline, events"),
+    VICE_PRINCIPAL("Vice Principal", "Vice Principal - Assists principal, student discipline, events"),
+    DEPARTMENT_HEAD("DepartmentHead", "Department Head - Manages specific academic or support department"),
+    DEAN("Dean", "Dean of Students - Student welfare, discipline, and pastoral care"),
+    ACADEMIC_COORDINATOR("Academic Coordinator", "Academic Coordinator - Curriculum planning and coordination");
 
     // Instance variables
     private final String displayName;
