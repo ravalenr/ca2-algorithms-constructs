@@ -25,7 +25,7 @@ public class SearchAlgorithms {
      * @param searchName Name or partial name to search for
      * @return Array of matching employees (empty if none found)
      */
-    public static Employee[] binarySearch(Employee[] employees, String searchName) {
+    public static Employee[] linearSearch(Employee[] employees, String searchName) {
         // Input validation
         if (employees == null || employees.length == 0 || searchName == null || searchName.trim().isEmpty()) {
             return new Employee[0];
@@ -97,7 +97,7 @@ public class SearchAlgorithms {
         System.out.println("Searching for: " + searchName);
         System.out.println("----------------------------------------");
 
-        Employee[] results = binarySearch(employees, searchName);
+        Employee[] results = linearSearch(employees, searchName);
 
         if (results.length == 0) {
             System.out.println("No employees found matching '" + searchName + "'");
