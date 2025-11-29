@@ -12,106 +12,20 @@ package CA_2;
  */
 public enum ManagerType {
     // Enum constants representing different manager types in a school context
-    PRINCIPAL("Principal", "School Principal - Overall school leadership and administration"),
-    DEPUTY_PRINCIPAL("DeputyPrincipal", "Deputy Principal/Vice Principal - Assists principal, student discipline, events"),
-    VICE_PRINCIPAL("Vice Principal", "Vice Principal - Assists principal, student discipline, events"),
-    DEPARTMENT_HEAD("DepartmentHead", "Department Head - Manages specific academic or support department"),
-    DEAN("Dean", "Dean of Students - Student welfare, discipline, and pastoral care"),
-    ACADEMIC_COORDINATOR("Academic Coordinator", "Academic Coordinator - Curriculum planning and coordination");
+    PRINCIPAL("Principal"),
+    DEPUTY_PRINCIPAL("DeputyPrincipal"),
+    VICE_PRINCIPAL("Vice Principal"),
+    DEPARTMENT_HEAD("DepartmentHead"),
+    DEAN("Dean"),
+    ACADEMIC_COORDINATOR("Academic Coordinator");
 
-    // Instance variables
     private final String displayName;
-    private final String description;
 
-    /**
-     * Private constructor for enum constants
-     * Initializes each manager type with its display name and description
-     *
-     * @param displayName The human-readable name for this manager type
-     * @param description A description of the manager type's role and responsibilities
-     */
-    private ManagerType(String displayName, String description) {
+    private ManagerType(String displayName) {
         this.displayName = displayName;
-        this.description = description;
     }
 
-    /**
-     * Returns the display name of this manager type
-     * This is the human-readable format used in the UI
-     *
-     * @return The display name as a String
-     */
     public String getDisplayName() {
-        return displayName;
-    }
-
-    /**
-     * Returns the description of this manager type
-     * Provides details about the role and responsibilities
-     *
-     * @return The description as a String
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Finds a ManagerType enum by its display name (case-insensitive)
-     * This method is useful for converting user input strings to enum values
-     *
-     * @param displayName The display name to search for
-     * @return The matching ManagerType, or null if not found
-     */
-    public static ManagerType fromDisplayName(String displayName) {
-        if (displayName == null) {
-            return null;
-        }
-
-        for (ManagerType type : ManagerType.values()) {
-            if (type.displayName.equalsIgnoreCase(displayName)) {
-                return type;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Checks if a given string is a valid manager type display name
-     *
-     * @param displayName The string to validate
-     * @return true if the string matches a valid manager type, false otherwise
-     */
-    public static boolean isValidManagerType(String displayName) {
-        return fromDisplayName(displayName) != null;
-    }
-
-    /**
-     * Returns a string representation of all available manager types
-     * Useful for displaying options to users
-     *
-     * @return A formatted string listing all manager types
-     */
-    public static String getAllManagerTypes() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Available Manager Types:\n");
-
-        ManagerType[] types = ManagerType.values();
-        for (int i = 0; i < types.length; i++) {
-            sb.append((i + 1)).append(". ").append(types[i].getDisplayName()).append("\n");
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Returns the string representation of this manager type
-     * Returns the display name for easy printing
-     *
-     * @return The display name as a String
-     */
-    @Override
-    public String toString() {
         return displayName;
     }
 }

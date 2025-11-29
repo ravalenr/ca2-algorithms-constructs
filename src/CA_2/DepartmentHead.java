@@ -18,10 +18,4 @@ public class DepartmentHead extends Manager {
                          double salary, String position, String jobTitle, String company) {
         super(firstName, lastName, gender, email, salary, position, jobTitle, company, ManagerType.DEPARTMENT_HEAD);
     }
-
-    @Override
-    public String getManagerInfo() {
-        return "Role: Department Head - Manages department operations and curriculum. " +
-               "Managing " + employeeCount + " staff members.";
-    }
 }

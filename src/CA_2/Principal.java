@@ -18,10 +18,4 @@ public class Principal extends Manager {
                     double salary, String position, String jobTitle, String company) {
         super(firstName, lastName, gender, email, salary, position, jobTitle, company, ManagerType.PRINCIPAL);
     }
-
-    @Override
-    public String getManagerInfo() {
-        return "Role: Principal - Overall school leadership and strategic planning. " +
-               "Managing " + employeeCount + " staff members.";
-    }
 }

@@ -74,49 +74,19 @@ public class Employee {
         return id;
     }
 
-    // Getters and Setters
     public String getEmployeeId() { return employeeId; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public String getFullName() { return firstName + " " + lastName; }
-    public String getGender() { return gender; }
     public String getEmail() { return email; }
     public double getSalary() { return salary; }
-    public String getPosition() { return position; }
     public String getJobTitle() { return jobTitle; }
-    public String getCompany() { return company; }
     public Manager getManager() { return manager; }
     public Department getDepartment() { return department; }
     public boolean isRandomlyGenerated() { return isRandomlyGenerated; }
 
-    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-    public void setGender(String gender) { this.gender = gender; }
-    public void setEmail(String email) { this.email = email; }
-    public void setSalary(double salary) { this.salary = salary; }
-    public void setPosition(String position) { this.position = position; }
-    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
-    public void setCompany(String company) { this.company = company; }
     public void setManager(Manager manager) { this.manager = manager; }
     public void setDepartment(Department department) { this.department = department; }
-    public void setRandomlyGenerated(boolean isRandomlyGenerated) { this.isRandomlyGenerated = isRandomlyGenerated; }
-
-    /**
-     * Returns string representation of employee
-     */
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "ID='" + employeeId + '\'' +
-                ", Name='" + getFullName() + '\'' +
-                ", Email='" + email + '\'' +
-                ", Salary=" + salary +
-                ", JobTitle='" + jobTitle + '\'' +
-                ", Manager=" + (manager != null ? manager.getFullName() : "None") +
-                ", Department=" + (department != null ? department.getDepartmentName() : "None") +
-                '}';
-    }
 
     /**
      * Displays employee information

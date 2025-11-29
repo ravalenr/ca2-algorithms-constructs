@@ -76,39 +76,8 @@ public abstract class Department {
         return true;
     }
 
-    /**
-     * Returns list of all staff members
-     */
-    public ArrayList<Employee> getStaffList() {
-        return new ArrayList<>(staffMembers);
-    }
-
-    /**
-     * Returns department-specific information (implemented by subclasses)
-     */
-    public abstract String getDepartmentInfo();
-
-    // Getters and Setters
-    public String getDepartmentId() { return departmentId; }
     public String getDepartmentName() { return departmentName; }
-    public DepartmentType getDepartmentType() { return departmentType; }
     public String getDepartmentTypeString() { return departmentType != null ? departmentType.getDisplayName() : "Unknown"; }
-    public Manager getDepartmentHead() { return departmentHead; }
-    public int getStaffCount() { return staffCount; }
 
-    public void setDepartmentId(String departmentId) { this.departmentId = departmentId; }
-    public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
-    public void setDepartmentType(DepartmentType departmentType) { this.departmentType = departmentType; }
     public void setDepartmentHead(Manager departmentHead) { this.departmentHead = departmentHead; }
-
-    @Override
-    public String toString() {
-        return "Department{" +
-                "ID='" + departmentId + '\'' +
-                ", Name='" + departmentName + '\'' +
-                ", Type='" + getDepartmentTypeString() + '\'' +
-                ", Staff=" + staffCount +
-                ", Head=" + (departmentHead != null ? departmentHead.getFullName() : "None") +
-                '}';
-    }
 }

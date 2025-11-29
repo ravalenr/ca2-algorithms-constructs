@@ -32,13 +32,4 @@ public class Teacher extends Employee {
                   double salary, String position, String jobTitle, String company) {
         super(firstName, lastName, gender, email, salary, position, jobTitle, company);
     }
-
-    @Override
-    public String toString() {
-        return "Teacher{" +
-                "ID='" + employeeId + '\'' +
-                ", Name='" + getFullName() + '\'' +
-                ", Department=" + (department != null ? department.getDepartmentName() : "None") +
-                '}';
-    }
 }

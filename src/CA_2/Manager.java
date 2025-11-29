@@ -59,49 +59,9 @@ public abstract class Manager extends Employee {
         return true;
     }
 
-    /**
-     * Removes an employee from this manager's team
-     */
-    public boolean removeEmployee(Employee employee) {
-        if (employee == null) {
-            return false;
-        }
-
-        boolean removed = managedEmployees.remove(employee);
-
-        if (removed) {
-            employee.setManager(null);
-            employeeCount = managedEmployees.size();
-        }
-
-        return removed;
-    }
-
-    /**
-     * Returns manager-specific information (implemented by subclasses)
-     */
-    public abstract String getManagerInfo();
-
-    // Getters and Setters
-    public String getManagerId() { return managerId; }
-    public ArrayList<Employee> getManagedEmployees() { return managedEmployees; }
     public int getEmployeeCount() { return employeeCount; }
     public ManagerType getManagerType() { return managerType; }
     public String getManagerTypeString() { return managerType != null ? managerType.getDisplayName() : "Unknown"; }
-
-    public void setManagerId(String managerId) { this.managerId = managerId; }
-    public void setManagerType(ManagerType managerType) { this.managerType = managerType; }
-
-    @Override
-    public String toString() {
-        return "Manager{" +
-                "ManagerID='" + managerId + '\'' +
-                ", Name='" + getFullName() + '\'' +
-                ", Type='" + getManagerTypeString() + '\'' +
-                ", EmployeeCount=" + employeeCount +
-                ", Department=" + (department != null ? department.getDepartmentName() : "None") +
-                '}';
-    }
 
     @Override
     public void displayInfo() {
@@ -115,7 +75,6 @@ public abstract class Manager extends Employee {
         System.out.println("Job Title: " + jobTitle);
         System.out.println("Employees Managed: " + employeeCount);
         System.out.println("Department: " + (department != null ? department.getDepartmentName() : "None"));
-        System.out.println(getManagerInfo());
         System.out.println("========================================");
     }
 }

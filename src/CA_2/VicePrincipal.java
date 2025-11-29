@@ -18,10 +18,4 @@ public class VicePrincipal extends Manager {
                         double salary, String position, String jobTitle, String company) {
         super(firstName, lastName, gender, email, salary, position, jobTitle, company, ManagerType.VICE_PRINCIPAL);
     }
-
-    @Override
-    public String getManagerInfo() {
-        return "Role: Vice Principal - Assists principal, manages discipline and events. " +
-               "Managing " + employeeCount + " staff members.";
-    }
 }
