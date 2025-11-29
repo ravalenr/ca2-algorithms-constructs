@@ -12,15 +12,42 @@ package CA_2;
  */
 public enum DepartmentType {
     // Enum constants representing different department types
-    IT_DEVELOPMENT("IT Development", "Information Technology and Software Development"),
-    SALES("Sales", "Sales and Business Development"),
-    HR("HR", "Human Resources"),
-    FINANCE("Finance", "Financial Management and Accounting"),
-    MARKETING("Marketing", "Marketing and Communications"),
-    ACCOUNTING("Accounting", "Accounting and Financial Records"),
-    OPERATIONS("Operations", "Operations and Logistics"),
-    TECHNICAL_SUPPORT("Technical Support", "Technical Support and Customer Service"),
-    CUSTOMER_SERVICE("Customer Service", "Customer Relations and Support");
+    // Academic Departments
+    SLAYER_STUDIES("Slayer Studies", "Slayer training and combat education"),
+    MAGIC_COMPUTATION("Magic & Computation", "Magical sciences and computational studies"),
+    MATHEMATICS("Mathematics", "Mathematics and numerical sciences"),
+    SCIENCE("Science", "Biology, Chemistry, Physics, and general sciences"),
+    ENGLISH("English", "English language and literature"),
+    MODERN_LANGUAGES("Modern Languages", "Foreign language instruction (Spanish, Japanese, etc.)"),
+    GEOGRAPHY("Geography", "Geography and earth sciences"),
+    HISTORY("History", "History and ancient civilizations"),
+    COMPUTER_SCIENCE("Computer Science", "Computer science, programming, and cybersecurity"),
+    PHYSICAL_EDUCATION("Physical Education", "Sports, fitness, and physical education"),
+
+    // Arts and Performance Departments
+    PERFORMING_ARTS("Performing Arts", "Music, vocal performance, and musical theatre"),
+    DRAMA("Drama", "Drama, acting, and theatre arts"),
+    MUSIC("Music", "Music education and instrumental instruction"),
+    ART("Art", "Visual arts and creative expression"),
+
+    // Student Support Services
+    LIBRARY("Library", "Library services and information resources"),
+    GUIDANCE("Guidance", "Student counselling and guidance services"),
+    STUDENT_SUPPORT("Student Support", "Student welfare, behaviour, and liaison services"),
+    NURSING("Nursing", "School health and medical services"),
+
+    // Administrative and Support Departments
+    SENIOR_MANAGEMENT("Senior Management", "School leadership and administration"),
+    FINANCE_ADMINISTRATION("Finance and Administration", "Financial management and accounting"),
+    RECEPTION("Reception", "Reception and front office services"),
+    LEGAL("Legal", "Legal advisory services"),
+
+    // Facilities and Operations
+    FACILITIES("Facilities", "Campus maintenance and support coordination"),
+    SECURITY("Security", "Campus security and safety services"),
+    IT_SUPPORT("IT Support", "Technology support and systems engineering"),
+    MECHANICS("Mechanics", "Workshop and technical instruction"),
+    CANTEEN("Canteen", "Food services and canteen operations");
 
     // Instance variables
     private final String displayName;

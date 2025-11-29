@@ -1,11 +1,8 @@
 package CA_2;
 
 /**
- * Employee class serves as the parent class for all employee types in the school management system.
- * This class contains common attributes and methods that all employees share regardless of their role.
- *
- * Design Decision: Using a parent class allows for code reusability and polymorphism,
- * enabling different employee types to be treated uniformly while maintaining their unique characteristics.
+ * Employee class is the parent class for all employee types.
+ * Contains common attributes and methods shared by all employees.
  *
  * @author Rafael Valentim Ribeiro
  * @version 1.0
@@ -24,10 +21,10 @@ public class Employee {
     protected String company;
     protected Manager manager;
     protected Department department;
+    protected boolean isRandomlyGenerated;
 
     /**
      * Default constructor
-     * Creates an Employee object with default values
      */
     public Employee() {
         this.employeeId = "";
@@ -41,20 +38,11 @@ public class Employee {
         this.company = "";
         this.manager = null;
         this.department = null;
+        this.isRandomlyGenerated = false;
     }
 
     /**
-     * Parameterized constructor
-     * Creates an Employee object with specified values
-     *
-     * @param firstName First name of the employee
-     * @param lastName Last name of the employee
-     * @param gender Gender of the employee
-     * @param email Email address of the employee
-     * @param salary Annual salary of the employee
-     * @param position Position level (senior, middle, junior, etc.)
-     * @param jobTitle Job title of the employee
-     * @param company Company name
+     * Constructor with parameters
      */
     public Employee(String firstName, String lastName, String gender, String email,
                    double salary, String position, String jobTitle, String company) {
@@ -69,15 +57,12 @@ public class Employee {
         this.company = company;
         this.manager = null;
         this.department = null;
+        this.isRandomlyGenerated = false;
     }
 
     /**
-     * Generates a unique employee ID based on first and last name
+     * Generates a unique employee ID.
      * Format: First letter of first name + last name + random 3 digits
-     *
-     * @param firstName Employee's first name
-     * @param lastName Employee's last name
-     * @return Generated employee ID
      */
     private String generateEmployeeId(String firstName, String lastName) {
         if (firstName == null || lastName == null || firstName.isEmpty() || lastName.isEmpty()) {
@@ -89,199 +74,36 @@ public class Employee {
         return id;
     }
 
-    // Getter methods
+    // Getters and Setters
+    public String getEmployeeId() { return employeeId; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getFullName() { return firstName + " " + lastName; }
+    public String getGender() { return gender; }
+    public String getEmail() { return email; }
+    public double getSalary() { return salary; }
+    public String getPosition() { return position; }
+    public String getJobTitle() { return jobTitle; }
+    public String getCompany() { return company; }
+    public Manager getManager() { return manager; }
+    public Department getDepartment() { return department; }
+    public boolean isRandomlyGenerated() { return isRandomlyGenerated; }
+
+    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setGender(String gender) { this.gender = gender; }
+    public void setEmail(String email) { this.email = email; }
+    public void setSalary(double salary) { this.salary = salary; }
+    public void setPosition(String position) { this.position = position; }
+    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
+    public void setCompany(String company) { this.company = company; }
+    public void setManager(Manager manager) { this.manager = manager; }
+    public void setDepartment(Department department) { this.department = department; }
+    public void setRandomlyGenerated(boolean isRandomlyGenerated) { this.isRandomlyGenerated = isRandomlyGenerated; }
 
     /**
-     * Returns the employee's unique identifier
-     * @return employeeId as String
-     */
-    public String getEmployeeId() {
-        return employeeId;
-    }
-
-    /**
-     * Returns the employee's first name
-     * @return firstName as String
-     */
-    public String getFirstName() {
-        return firstName;
-    }
-
-    /**
-     * Returns the employee's last name
-     * @return lastName as String
-     */
-    public String getLastName() {
-        return lastName;
-    }
-
-    /**
-     * Returns the employee's full name (First Last)
-     * @return Full name as String
-     */
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
-
-    /**
-     * Returns the employee's gender
-     * @return gender as String
-     */
-    public String getGender() {
-        return gender;
-    }
-
-    /**
-     * Returns the employee's email address
-     * @return email as String
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Returns the employee's salary
-     * @return salary as double
-     */
-    public double getSalary() {
-        return salary;
-    }
-
-    /**
-     * Returns the employee's position level
-     * @return position as String
-     */
-    public String getPosition() {
-        return position;
-    }
-
-    /**
-     * Returns the employee's job title
-     * @return jobTitle as String
-     */
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    /**
-     * Returns the company name
-     * @return company as String
-     */
-    public String getCompany() {
-        return company;
-    }
-
-    /**
-     * Returns the employee's assigned manager
-     * @return manager as Manager object
-     */
-    public Manager getManager() {
-        return manager;
-    }
-
-    /**
-     * Returns the employee's department
-     * @return department as Department object
-     */
-    public Department getDepartment() {
-        return department;
-    }
-
-    // Setter methods
-
-    /**
-     * Sets the employee's unique identifier
-     * @param employeeId The unique ID to set
-     */
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
-    }
-
-    /**
-     * Sets the employee's first name
-     * @param firstName The first name to set
-     */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    /**
-     * Sets the employee's last name
-     * @param lastName The last name to set
-     */
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    /**
-     * Sets the employee's gender
-     * @param gender The gender to set
-     */
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    /**
-     * Sets the employee's email address
-     * @param email The email to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * Sets the employee's salary
-     * @param salary The salary to set
-     */
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
-
-    /**
-     * Sets the employee's position level
-     * @param position The position to set
-     */
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    /**
-     * Sets the employee's job title
-     * @param jobTitle The job title to set
-     */
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
-
-    /**
-     * Sets the company name
-     * @param company The company name to set
-     */
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    /**
-     * Sets the employee's manager
-     * @param manager The manager to assign
-     */
-    public void setManager(Manager manager) {
-        this.manager = manager;
-    }
-
-    /**
-     * Sets the employee's department
-     * @param department The department to assign
-     */
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    /**
-     * Returns a string representation of the Employee object
-     * Useful for displaying employee information in a readable format
-     *
-     * @return String containing employee details
+     * Returns string representation of employee
      */
     @Override
     public String toString() {
@@ -297,8 +119,7 @@ public class Employee {
     }
 
     /**
-     * Displays the employee's complete information to the console
-     * This method provides a formatted output for better readability
+     * Displays employee information
      */
     public void displayInfo() {
         System.out.println("========================================");

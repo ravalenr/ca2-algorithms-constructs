@@ -7,49 +7,20 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * SchoolManagementSystem is the main application class that manages employee records
- * for a school organization. This class provides a console-based interface for sorting,
- * searching, adding, and generating employee data.
- *
- * Design Decision: This class serves as the controller and main entry point for the application,
- * coordinating between the data model (Employee objects), algorithms (sorting and searching),
- * and user interface (console menu system).
- *
- * Key Features implemented in this system:
- * 1. File Reading - Loads employee data from CSV file
- * 2. Sorting - Uses Binary Tree Sort (recursive) to sort employees alphabetically
- * 3. Searching - Uses Binary Search (recursive) to find specific employees
- * 4. Adding Records - Allows users to add new employee records with validation
- * 5. Random Generation - Creates random employee data for testing purposes
- * 6. Menu System - Uses Enums for structured, type-safe menu navigation
+ * Main application class for the School Management System.
+ * Provides console interface for managing employee records with sorting and searching.
  *
  * @author Rafael Valentim Ribeiro
  * @version 1.0
  */
 public class SchoolManagementSystem {
 
-    /**
-     * Instance variable to store all employees in the system
-     * This ArrayList holds all Employee objects, including Manager subclasses
-     */
     private ArrayList<Employee> employeeList;
 
-    /**
-     * Instance variable to store all managers separately for quick access
-     * This ArrayList provides convenient access to Manager objects for assignment operations
-     */
     private ArrayList<Manager> managerList;
 
-    /**
-     * Instance variable to store all departments in the system
-     * This ArrayList holds all Department objects for the school
-     */
     private ArrayList<Department> departmentList;
 
-    /**
-     * Scanner object for reading user input from console
-     * Used throughout the application for all user interactions
-     */
     private Scanner scanner;
 
     /**
@@ -128,6 +99,9 @@ public class SchoolManagementSystem {
                 case DISPLAY_HIERARCHY:
                     handleDisplayHierarchy();
                     break;
+                case CHANGE_FILE:
+                    handleChangeDataFile();
+                    break;
                 case EXIT:
                     running = false;
                     displayExitMessage();
@@ -139,28 +113,21 @@ public class SchoolManagementSystem {
         scanner.close();
     }
 
-    /**
-     * Displays welcome message when the application starts
-     * Provides context about the application and its purpose
-     */
     private void displayWelcomeMessage() {
         System.out.println("\n");
         System.out.println("========================================");
-        System.out.println("   SCHOOL MANAGEMENT SYSTEM");
+        System.out.println("   SUNNYDALE HIGH SCHOOL");
+        System.out.println("   Staff Management System");
+        System.out.println("========================================");
         System.out.println("   Student: Rafael Valentim Ribeiro");
         System.out.println("   Student ID: 2025129");
         System.out.println("========================================");
-        System.out.println("Welcome to the School Management System!");
-        System.out.println("This system allows you to manage employee");
-        System.out.println("records efficiently using advanced sorting");
-        System.out.println("and searching algorithms.");
+        System.out.println("Welcome to Sunnydale High School!");
+        System.out.println("This system manages staff records using");
+        System.out.println("advanced sorting and searching algorithms.");
         System.out.println("========================================\n");
     }
 
-    /**
-     * Displays exit message when the application closes
-     * Provides a friendly goodbye message to the user
-     */
     private void displayExitMessage() {
         System.out.println("\n========================================");
         System.out.println("Thank you for using the");
@@ -169,12 +136,6 @@ public class SchoolManagementSystem {
         System.out.println("========================================\n");
     }
 
-    /**
-     * Prompts the user to enter a filename for loading employee data
-     * Implements input validation to ensure a filename is provided
-     *
-     * @return The filename entered by the user as a String
-     */
     private String promptForFilename() {
         System.out.println("Please enter the filename to read:");
         System.out.print("> ");
@@ -191,12 +152,6 @@ public class SchoolManagementSystem {
         return filename;
     }
 
-    /**
-     * Reads the user's menu choice from console input
-     * Implements error handling for invalid integer input
-     *
-     * @return The user's menu choice as an integer
-     */
     private int getUserMenuChoice() {
         while (true) {
             try {
@@ -209,20 +164,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    /**
-     * Loads employee data from a CSV file and populates the system
-     * File format expected: First name,Last name,Gender,Email,Salary,Department,Position,Job title,Company
-     *
-     * This method performs the following operations:
-     * 1. Reads the CSV file line by line
-     * 2. Parses each line to extract employee information
-     * 3. Creates appropriate Employee or Manager objects
-     * 4. Assigns departments to employees
-     * 5. Assigns managers to employees
-     *
-     * @param filename The name of the file to read
-     * @return true if file was loaded successfully, false otherwise
-     */
     private boolean loadEmployeeDataFromFile(String filename) {
         System.out.println("\nLoading employee data from file: " + filename);
 
@@ -255,9 +196,38 @@ public class SchoolManagementSystem {
                     String jobTitle = data[7].trim();
                     String company = data[8].trim();
 
-                    // Create Employee object (will be Teacher for this school system)
-                    Employee employee = new Teacher(firstName, lastName, gender, email,
-                            salary, position, jobTitle, company);
+                    // Check if position indicates this should be a Manager
+                    ManagerType managerType = ManagerType.fromDisplayName(position);
+
+                    Employee employee;
+
+                    if (managerType != null) {
+                        // Create Manager object based on manager type
+                        Manager manager = null;
+
+                        if (managerType == ManagerType.PRINCIPAL) {
+                            manager = new Principal(firstName, lastName, gender, email,
+                                    salary, position, jobTitle, company);
+                        } else if (managerType == ManagerType.DEPUTY_PRINCIPAL ||
+                                   managerType == ManagerType.VICE_PRINCIPAL) {
+                            manager = new VicePrincipal(firstName, lastName, gender, email,
+                                    salary, position, jobTitle, company);
+                        } else if (managerType == ManagerType.DEPARTMENT_HEAD) {
+                            manager = new DepartmentHead(firstName, lastName, gender, email,
+                                    salary, position, jobTitle, company);
+                        } else {
+                            // For other manager types, use DepartmentHead as default
+                            manager = new DepartmentHead(firstName, lastName, gender, email,
+                                    salary, position, jobTitle, company);
+                        }
+
+                        employee = manager;
+                        managerList.add(manager);
+                    } else {
+                        // Create regular Teacher employee
+                        employee = new Teacher(firstName, lastName, gender, email,
+                                salary, position, jobTitle, company);
+                    }
 
                     // Add to employee list
                     employeeList.add(employee);
@@ -271,8 +241,9 @@ public class SchoolManagementSystem {
                 }
             }
 
-            // Create some managers for the loaded employees
-            createManagersForDepartments();
+            // Note: Managers are now loaded directly from the file based on position field
+            // Only create additional managers for departments that don't have one
+            createManagersForDepartmentsIfNeeded();
 
             // Assign managers to employees based on department
             assignManagersToEmployees();
@@ -293,13 +264,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    /**
-     * Parses a salary string to double value
-     * Implements error handling for invalid number formats
-     *
-     * @param salaryStr The salary as a string
-     * @return The salary as a double, or 0.0 if parsing fails
-     */
     private double parseSalary(String salaryStr) {
         try {
             return Double.parseDouble(salaryStr);
@@ -308,13 +272,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    /**
-     * Finds an existing department or creates a new one
-     * This method ensures we don't create duplicate departments
-     *
-     * @param departmentName Name of the department
-     * @return Department object (either existing or newly created)
-     */
     private Department findOrCreateDepartment(String departmentName) {
         // Check if department already exists in our list
         for (Department dept : departmentList) {
@@ -327,9 +284,10 @@ public class SchoolManagementSystem {
         // Try to match the department name to a DepartmentType enum value
         DepartmentType deptType = DepartmentType.fromDisplayName(departmentName);
 
-        // If no match found, use IT_DEVELOPMENT as default
+        // If no match found, use STUDENT_SUPPORT as default
         if (deptType == null) {
-            deptType = DepartmentType.IT_DEVELOPMENT;
+            System.out.println("Warning: Department '" + departmentName + "' not found in enum. Using STUDENT_SUPPORT as default.");
+            deptType = DepartmentType.STUDENT_SUPPORT;
         }
 
         // Create new department as AcademicDepartment (suitable for school)
@@ -339,10 +297,18 @@ public class SchoolManagementSystem {
         return newDept;
     }
 
-    /**
-     * Creates manager positions for each department
-     * This method ensures each department has at least one manager
-     */
+    private void createManagersForDepartmentsIfNeeded() {
+        // If managers were loaded from file, we don't need to create additional ones
+        if (managerList.size() > 0) {
+            System.out.println("Managers loaded from file. Skipping automatic manager creation.");
+            return;
+        }
+
+        // Only create managers if none were loaded from file
+        System.out.println("No managers found in file. Creating default managers for departments...");
+        createManagersForDepartments();
+    }
+
     private void createManagersForDepartments() {
         // School-appropriate names for managers
         String[] principalFirstNames = {"Robert", "Margaret", "William"};
@@ -385,16 +351,16 @@ public class SchoolManagementSystem {
                 principalIndex++;
 
                 manager = new Principal(firstName, lastName, "Male",
-                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
-                        85000.0, "senior", "Principal", "School");
+                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu",
+                        85000.0, "senior", "Principal", "Sunnydale High School");
             } else if (managerType == ManagerType.VICE_PRINCIPAL) {
                 String firstName = vpFirstNames[vpIndex % vpFirstNames.length];
                 String lastName = vpLastNames[vpIndex % vpLastNames.length];
                 vpIndex++;
 
                 manager = new VicePrincipal(firstName, lastName, "Female",
-                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
-                        75000.0, "senior", "Vice Principal", "School");
+                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu",
+                        75000.0, "senior", "Vice Principal", "Sunnydale High School");
             } else {
                 // Department Head - use proper names
                 String firstName = headFirstNames[headIndex % headFirstNames.length];
@@ -402,8 +368,8 @@ public class SchoolManagementSystem {
                 headIndex++;
 
                 manager = new DepartmentHead(firstName, lastName, "Male",
-                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
-                        65000.0, "senior", "Department Head of " + deptName, "School");
+                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu",
+                        65000.0, "senior", "Department Head of " + deptName, "Sunnydale High School");
             }
 
             // Assign department to manager
@@ -417,10 +383,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    /**
-     * Assigns managers to employees based on department
-     * Each employee is assigned to a manager in their department
-     */
     private void assignManagersToEmployees() {
         for (Employee emp : employeeList) {
             // Skip if already a manager or already has a manager assigned
@@ -436,13 +398,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    /**
-     * Finds an appropriate manager for an employee
-     * Prioritizes managers in the same department
-     *
-     * @param employee The employee who needs a manager
-     * @return Manager object, or null if no suitable manager found
-     */
     private Manager findManagerForEmployee(Employee employee) {
         Department empDept = employee.getDepartment();
 
@@ -462,16 +417,6 @@ public class SchoolManagementSystem {
         return null;
     }
 
-    /**
-     * Handles the Sort Employees menu option
-     * Sorts all employees alphabetically by name and displays the first 20
-     *
-     * This method demonstrates the use of Merge Sort algorithm:
-     * 1. Asks user to choose sort order (Last Name or First Name)
-     * 2. Converts ArrayList to array
-     * 3. Calls appropriate SortingAlgorithms method which uses Merge Sort
-     * 4. Displays the first 20 sorted employees with their details
-     */
     private void handleSortEmployees() {
         System.out.println("\n>>> SORT option selected");
 
@@ -503,16 +448,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    /**
-     * Handles the Search Employee menu option
-     * Prompts user for a name and searches for the employee using Binary Search
-     *
-     * This method demonstrates the use of Binary Search algorithm:
-     * 1. Sorts the employee array (required for Binary Search)
-     * 2. Prompts user for search term
-     * 3. Calls SearchAlgorithms.searchAndDisplay() which uses Binary Search (recursive)
-     * 4. Displays employee details if found, or not found message
-     */
     private void handleSearchEmployee() {
         System.out.println("\n>>> SEARCH option selected");
 
@@ -542,18 +477,6 @@ public class SchoolManagementSystem {
         SearchAlgorithms.searchAndDisplay(sortedArray, searchName);
     }
 
-    /**
-     * Handles the Add New Employee menu option
-     * Prompts user for employee details and adds them to the system
-     *
-     * This method implements comprehensive input validation:
-     * 1. Validates all required fields are not empty
-     * 2. Validates numeric inputs (salary)
-     * 3. Validates enum selections (Manager Type, Department)
-     * 4. Creates appropriate Employee object
-     * 5. Assigns department and manager
-     * 6. Adds to system and displays confirmation
-     */
     private void handleAddEmployee() {
         System.out.println("\n>>> ADD NEW EMPLOYEE option selected");
         System.out.println("========================================");
@@ -613,12 +536,12 @@ public class SchoolManagementSystem {
             selectedDeptType = departmentTypes[deptChoice - 1];
         } else {
             System.out.println("Invalid choice. Using default department.");
-            selectedDeptType = DepartmentType.IT_DEVELOPMENT;
+            selectedDeptType = DepartmentType.STUDENT_SUPPORT;
         }
 
         // Create the new employee as a Teacher (appropriate for school system)
         Employee newEmployee = new Teacher(firstName, lastName, gender, email,
-                salary, position, jobTitle, "School");
+                salary, position, jobTitle, "Sunnydale High School");
 
         // Find or create department and assign to employee
         Department dept = findOrCreateDepartment(selectedDeptType.getDisplayName());
@@ -650,14 +573,6 @@ public class SchoolManagementSystem {
         newEmployee.displayInfo();
     }
 
-    /**
-     * Finds an existing manager of a specific type or creates a new one
-     * This ensures that each manager type exists in each department
-     *
-     * @param managerType The type of manager to find or create
-     * @param department The department for the manager
-     * @return Manager object (either existing or newly created)
-     */
     private Manager findOrCreateManager(ManagerType managerType, Department department) {
         // Try to find existing manager of this type in this department
         for (Manager manager : managerList) {
@@ -682,16 +597,16 @@ public class SchoolManagementSystem {
         // Create appropriate Manager subclass based on type
         if (managerType == ManagerType.PRINCIPAL) {
             newManager = new Principal(firstName, lastName, "Male",
-                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
-                    80000.0, "senior", "Principal", "School");
+                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu",
+                    80000.0, "senior", "Principal", "Sunnydale High School");
         } else if (managerType == ManagerType.VICE_PRINCIPAL) {
             newManager = new VicePrincipal(firstName, lastName, "Female",
-                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
-                    70000.0, "senior", "Vice Principal", "School");
+                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu",
+                    70000.0, "senior", "Vice Principal", "Sunnydale High School");
         } else {
             newManager = new DepartmentHead(firstName, lastName, "Male",
-                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com",
-                    60000.0, "senior", "Department Head of " + department.getDepartmentName(), "School");
+                    firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu",
+                    60000.0, "senior", "Department Head of " + department.getDepartmentName(), "Sunnydale High School");
         }
 
         // Assign department to manager
@@ -705,18 +620,6 @@ public class SchoolManagementSystem {
         return newManager;
     }
 
-    /**
-     * Handles the Generate Random Employees menu option
-     * Creates random employee records for testing purposes
-     *
-     * This method:
-     * 1. Prompts user for number of employees to generate
-     * 2. Validates the input (must be between 1 and 1000)
-     * 3. Generates random employee data using predefined arrays
-     * 4. Creates Employee objects with random attributes
-     * 5. Assigns random departments and managers
-     * 6. Displays all employees including newly generated ones
-     */
     private void handleGenerateRandomEmployees() {
         System.out.println("\n>>> GENERATE RANDOM EMPLOYEES option selected");
 
@@ -753,9 +656,15 @@ public class SchoolManagementSystem {
 
         // School-appropriate job titles
         String[] jobTitles = {
-            "Teacher", "Assistant Teacher", "Counselor", "Librarian",
-            "Lab Technician", "School Nurse", "Administrator", "Coordinator",
-            "Specialist", "Support Staff", "Custodian", "Security Guard"
+            "Teacher", "Assistant Teacher", "Senior Teacher", "Head of Year",
+            "Counselor", "Student Advisor", "Librarian", "Library Assistant",
+            "Lab Technician", "Science Technician", "School Nurse", "Health Assistant",
+            "Administrator", "Office Manager", "Receptionist", "Secretary",
+            "Coordinator", "Activities Coordinator", "Specialist", "Learning Support",
+            "Support Staff", "Teaching Assistant", "Custodian", "Maintenance Worker",
+            "Security Guard", "Campus Security", "IT Technician", "Systems Administrator",
+            "Canteen Staff", "Chef", "Music Teacher", "Art Teacher",
+            "PE Teacher", "Sports Coach", "Drama Teacher", "Language Teacher"
         };
 
         // Get available manager types and department types from enums
@@ -772,7 +681,7 @@ public class SchoolManagementSystem {
             String firstName = firstNames[(int) (Math.random() * firstNames.length)];
             String lastName = lastNames[(int) (Math.random() * lastNames.length)];
             String gender = genders[(int) (Math.random() * genders.length)];
-            String email = firstName.toLowerCase() + "." + lastName.toLowerCase() + "@school.com";
+            String email = firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.edu";
 
             // Generate random salary between 25,000 and 100,000
             double salary = 25000 + (Math.random() * 75000);
@@ -786,7 +695,10 @@ public class SchoolManagementSystem {
 
             // Create new employee as Teacher (appropriate for school)
             Employee newEmployee = new Teacher(firstName, lastName, gender, email,
-                    salary, position, jobTitle, "School");
+                    salary, position, jobTitle, "Sunnydale High School");
+
+            // Mark as randomly generated
+            newEmployee.setRandomlyGenerated(true);
 
             // Assign department
             Department dept = findOrCreateDepartment(randomDeptType.getDisplayName());
@@ -815,20 +727,11 @@ public class SchoolManagementSystem {
         displayAllEmployees();
     }
 
-    /**
-     * Handles the Display All Employees menu option
-     * Displays all employees currently in the system sorted alphabetically
-     */
     private void handleDisplayAllEmployees() {
         System.out.println("\n>>> DISPLAY ALL EMPLOYEES option selected");
         displayAllEmployees();
     }
 
-    /**
-     * Displays all employees currently in the system
-     * Shows employee name, job title, department, and assigned manager
-     * Employees are displayed in alphabetical order by last name
-     */
     private void displayAllEmployees() {
         if (employeeList.isEmpty()) {
             System.out.println("No employees to display.");
@@ -839,31 +742,79 @@ public class SchoolManagementSystem {
         Employee[] employeeArray = employeeList.toArray(new Employee[0]);
         Employee[] sortedEmployees = SortingAlgorithms.mergeSort(employeeArray);
 
+        // Count randomly generated employees
+        int randomCount = 0;
+        for (Employee emp : sortedEmployees) {
+            if (emp.isRandomlyGenerated()) {
+                randomCount++;
+            }
+        }
+
         System.out.println("========================================");
         System.out.println("ALL EMPLOYEES (" + sortedEmployees.length + " total)");
+        if (randomCount > 0) {
+            System.out.println("Randomly Generated: " + randomCount);
+        }
         System.out.println("Sorted alphabetically by last name");
         System.out.println("========================================");
 
         // Display each employee with their details
         for (int i = 0; i < sortedEmployees.length; i++) {
             Employee emp = sortedEmployees[i];
+            String randomTag = emp.isRandomlyGenerated() ? " [RANDOM]" : "";
             System.out.println((i + 1) + ". " + emp.getFullName() +
                     " - " + emp.getJobTitle() +
-                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")");
+                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")" +
+                    randomTag);
         }
 
         System.out.println("========================================\n");
     }
 
-    /**
-     * Handles the Display Employee Hierarchy menu option
-     * Displays the organizational hierarchy showing managers and their departments
-     *
-     * This method shows:
-     * 1. The organizational structure of the school
-     * 2. Managers and their assigned departments
-     * 3. Current system statistics
-     */
+    private void handleChangeDataFile() {
+        System.out.println("\n>>> CHANGE DATA FILE option selected");
+        System.out.println("========================================");
+        System.out.println("WARNING: This will clear all current data");
+        System.out.println("including manually added employees.");
+        System.out.println("========================================");
+        System.out.print("Do you want to continue? (yes/no): ");
+
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (!confirmation.equals("yes") && !confirmation.equals("y")) {
+            System.out.println("Operation cancelled. Returning to main menu.");
+            return;
+        }
+
+        // Prompt for new filename
+        String newFilename = promptForFilename();
+
+        // Clear existing data
+        employeeList.clear();
+        managerList.clear();
+        departmentList.clear();
+
+        System.out.println("\nClearing existing data...");
+        System.out.println("Loading new file: " + newFilename);
+
+        // Load new data from file
+        if (loadEmployeeDataFromFile(newFilename)) {
+            System.out.println("\n========================================");
+            System.out.println("SUCCESS: Data loaded from new file!");
+            System.out.println("Total employees loaded: " + employeeList.size());
+            System.out.println("Total managers: " + managerList.size());
+            System.out.println("Total departments: " + departmentList.size());
+            System.out.println("========================================\n");
+        } else {
+            System.out.println("\n========================================");
+            System.out.println("ERROR: Could not load data from file.");
+            System.out.println("The system is now empty.");
+            System.out.println("You can add employees manually or try");
+            System.out.println("loading another file.");
+            System.out.println("========================================\n");
+        }
+    }
+
     private void handleDisplayHierarchy() {
         System.out.println("\n>>> DISPLAY ORGANIZATIONAL HIERARCHY option selected");
 

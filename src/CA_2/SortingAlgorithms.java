@@ -2,45 +2,16 @@ package CA_2;
 
 /**
  * SortingAlgorithms class provides sorting functionality for employee records.
- * This class implements Merge Sort, a recursive divide-and-conquer sorting algorithm
- * that guarantees O(n log n) performance in all cases.
+ * This class implements Merge Sort, a recursive divide-and-conquer algorithm.
  *
- * ALGORITHM CHOICE: Merge Sort
+ * Why Merge Sort?
+ * - Properly recursive (divides problem into smaller parts, solves them, then merges)
+ * - O(n log n) time complexity guaranteed (unlike Quick Sort which can be O(n²))
+ * - Stable sort (keeps equal elements in same order)
+ * - Works well for employee data that needs reliable performance
  *
- * Design Decision: Merge Sort was chosen as the recursive sorting algorithm for this
- * School Management System for several compelling reasons:
- *
- * 1. GUARANTEED PERFORMANCE: Merge Sort provides O(n log n) time complexity in ALL cases
- *    (best, average, and worst). This ensures that sorting operations complete within
- *    the required 2-3 seconds even with large datasets (100+ employees).
- *
- * 2. STABILITY: Merge Sort is a stable sorting algorithm, meaning it preserves the
- *    relative order of employees with equal names. This is important for maintaining
- *    data consistency in organizational records.
- *
- * 3. PREDICTABLE: Unlike Quick Sort (O(n²) worst case) or Binary Tree Sort (O(n²) if
- *    unbalanced), Merge Sort's performance is predictable and reliable regardless of
- *    input data patterns.
- *
- * 4. CLEARLY RECURSIVE: The algorithm's divide-and-conquer nature makes it unambiguously
- *    recursive - the sorting logic itself recursively divides the problem into smaller
- *    subproblems, sorts them, and merges the results.
- *
- * 5. INDUSTRY STANDARD: Merge Sort is used in Java's standard library (Collections.sort()
- *    for objects) and is the preferred algorithm when stability and guaranteed performance
- *    are required.
- *
- * 6. EDUCATIONAL VALUE: Merge Sort is a classic example of the divide-and-conquer
- *    paradigm, demonstrating fundamental algorithmic thinking.
- *
- * Time Complexity:
- * - Best Case: O(n log n)
- * - Average Case: O(n log n)
- * - Worst Case: O(n log n) - GUARANTEED
- *
- * Space Complexity: O(n) - requires temporary arrays for merging
- *
- * Stability: STABLE - maintains relative order of equal elements
+ * Time Complexity: O(n log n) in all cases
+ * Space Complexity: O(n) - needs temporary arrays for merging
  *
  * @author Rafael Valentim Ribeiro
  * @version 2.0
@@ -48,16 +19,11 @@ package CA_2;
 public class SortingAlgorithms {
 
     /**
-     * Sorts an array of employees using the Merge Sort algorithm.
-     * This is the main public method that users call to sort employee data.
-     *
-     * Merge Sort is a recursive divide-and-conquer algorithm that:
-     * 1. Divides the array into two halves
-     * 2. Recursively sorts each half
-     * 3. Merges the sorted halves back together
+     * Sorts an array of employees using Merge Sort.
+     * Sorts by last name first, then first name if last names are equal.
      *
      * @param employees Array of Employee objects to sort
-     * @return Sorted array of Employee objects (sorted by last name, then first name)
+     * @return Sorted array of Employee objects
      */
     public static Employee[] mergeSort(Employee[] employees) {
         // Input validation - handle null or empty arrays
@@ -86,20 +52,12 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Recursive helper method that implements the core Merge Sort algorithm.
-     * This method divides the array into halves and recursively sorts them.
-     *
-     * RECURSIVE STRUCTURE:
-     * - Base Case: When left >= right, the subarray has 0 or 1 elements (already sorted)
-     * - Recursive Case:
-     *   1. Find the middle point to divide the array
-     *   2. Recursively sort the left half
-     *   3. Recursively sort the right half
-     *   4. Merge the two sorted halves
+     * Recursive helper method for Merge Sort.
+     * Divides array in half, recursively sorts each half, then merges them.
      *
      * @param employees The array being sorted
-     * @param left      The starting index of the subarray to sort
-     * @param right     The ending index of the subarray to sort
+     * @param left      Starting index of subarray
+     * @param right     Ending index of subarray
      */
     private static void mergeSortRecursive(Employee[] employees, int left, int right) {
         // Base case: if the subarray has 0 or 1 elements, it's already sorted
@@ -125,24 +83,14 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Merges two sorted subarrays into a single sorted subarray.
-     * This is the "conquer" step of the divide-and-conquer algorithm.
-     *
-     * The two subarrays to be merged are:
-     * - Left subarray: employees[left...middle]
-     * - Right subarray: employees[middle+1...right]
-     *
-     * MERGE ALGORITHM:
-     * 1. Create temporary arrays to hold the left and right subarrays
-     * 2. Compare elements from both subarrays and place the smaller one in the result
-     * 3. Copy any remaining elements from either subarray
-     *
-     * This method maintains stability by choosing the left element when values are equal.
+     * Merges two sorted subarrays into one sorted subarray.
+     * Left subarray: employees[left...middle]
+     * Right subarray: employees[middle+1...right]
      *
      * @param employees The array containing both subarrays
-     * @param left      Starting index of the left subarray
-     * @param middle    Ending index of the left subarray (middle+1 starts right subarray)
-     * @param right     Ending index of the right subarray
+     * @param left      Starting index of left subarray
+     * @param middle    Ending index of left subarray
+     * @param right     Ending index of right subarray
      */
     private static void merge(Employee[] employees, int left, int middle, int right) {
         // Calculate sizes of the two subarrays to be merged
@@ -207,15 +155,11 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Compares two employees for sorting purposes.
-     * This method defines the sorting order for the entire algorithm.
+     * Compares two employees by last name, then first name.
+     * Uses case-insensitive comparison.
      *
-     * COMPARISON LOGIC:
-     * - Primary sort: Last name (alphabetically, case-insensitive)
-     * - Secondary sort: First name (if last names are equal, case-insensitive)
-     *
-     * @param emp1 First employee to compare
-     * @param emp2 Second employee to compare
+     * @param emp1 First employee
+     * @param emp2 Second employee
      * @return Negative if emp1 < emp2, Positive if emp1 > emp2, Zero if equal
      */
     private static int compareEmployees(Employee emp1, Employee emp2) {
@@ -251,17 +195,10 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Sorts an array of employees and displays the first N employees.
-     * This method is specifically designed for the assignment requirement
-     * to sort and display the first 20 employee names.
-     *
-     * This method:
-     * 1. Sorts all employees using Merge Sort
-     * 2. Displays the first 'displayCount' employees (e.g., 20)
-     * 3. Shows additional information like job title and department
+     * Sorts employees and displays the first N results.
      *
      * @param employees    Array of employees to sort
-     * @param displayCount Number of employees to display (e.g., 20)
+     * @param displayCount Number of employees to display
      */
     public static void sortAndDisplayFirst(Employee[] employees, int displayCount) {
         // Input validation
@@ -273,9 +210,20 @@ public class SortingAlgorithms {
         // Sort the employees using Merge Sort
         Employee[] sortedEmployees = mergeSort(employees);
 
+        // Count randomly generated employees
+        int randomCount = 0;
+        for (Employee emp : sortedEmployees) {
+            if (emp.isRandomlyGenerated()) {
+                randomCount++;
+            }
+        }
+
         // Display header with formatting
         System.out.println("\n========================================");
         System.out.println("SORTED EMPLOYEE LIST (First " + displayCount + ")");
+        if (randomCount > 0) {
+            System.out.println("Total Randomly Generated: " + randomCount);
+        }
         System.out.println("========================================");
 
         // Determine how many employees to display
@@ -286,10 +234,14 @@ public class SortingAlgorithms {
         for (int i = 0; i < countToDisplay; i++) {
             Employee emp = sortedEmployees[i];
 
+            // Add [RANDOM] tag for randomly generated employees
+            String randomTag = emp.isRandomlyGenerated() ? " [RANDOM]" : "";
+
             // Format: "1. John Smith - Teacher (Mathematics Department)"
             System.out.println((i + 1) + ". " + emp.getFullName() +
                     " - " + emp.getJobTitle() +
-                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")");
+                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")" +
+                    randomTag);
         }
 
         // Display footer with statistics
@@ -299,54 +251,10 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Verifies if an array is correctly sorted in ascending order.
-     * This method is useful for testing and validation purposes.
+     * Compares two employees by first name, then last name.
      *
-     * The array is considered sorted if for every pair of adjacent elements,
-     * the earlier element is less than or equal to the later element.
-     *
-     * @param employees Array to check
-     * @return true if the array is sorted in ascending order, false otherwise
-     */
-    public static boolean isSorted(Employee[] employees) {
-        // Null or single-element arrays are considered sorted
-        if (employees == null || employees.length <= 1) {
-            return true;
-        }
-
-        // Check each pair of adjacent elements
-        for (int i = 0; i < employees.length - 1; i++) {
-            // If any element is greater than the next element, array is not sorted
-            if (compareEmployees(employees[i], employees[i + 1]) > 0) {
-                return false;
-            }
-        }
-
-        // All adjacent pairs are in order - array is sorted
-        return true;
-    }
-
-    /**
-     * Utility method to get a sorted array count.
-     * Returns the number of elements in a sorted array.
-     * This method exists for consistency with the original interface.
-     *
-     * @param employees Array of employees
-     * @return Number of employees in the array
-     */
-    public static int getSortedCount(Employee[] employees) {
-        if (employees == null) {
-            return 0;
-        }
-        return employees.length;
-    }
-
-    /**
-     * Compares two employees by FIRST NAME first, then last name.
-     * This is the opposite order from the main compareEmployees method.
-     *
-     * @param emp1 First employee to compare
-     * @param emp2 Second employee to compare
+     * @param emp1 First employee
+     * @param emp2 Second employee
      * @return Negative if emp1 < emp2, Positive if emp1 > emp2, Zero if equal
      */
     private static int compareEmployeesByFirstName(Employee emp1, Employee emp2) {
@@ -382,12 +290,10 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Sorts an array of employees by FIRST NAME using Merge Sort.
-     * This is an alternative sorting method for when you want employees
-     * sorted by first name instead of last name.
+     * Sorts employees by first name using Merge Sort.
      *
-     * @param employees Array of Employee objects to sort
-     * @return Sorted array of Employee objects (sorted by first name, then last name)
+     * @param employees Array of employees to sort
+     * @return Sorted array (by first name, then last name)
      */
     public static Employee[] mergeSortByFirstName(Employee[] employees) {
         // Input validation - handle null or empty arrays
@@ -413,12 +319,11 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Recursive helper method for sorting by FIRST NAME.
-     * Same structure as mergeSortRecursive but uses different comparison.
+     * Recursive helper for sorting by first name.
      *
      * @param employees The array being sorted
-     * @param left      The starting index of the subarray to sort
-     * @param right     The ending index of the subarray to sort
+     * @param left      Starting index
+     * @param right     Ending index
      */
     private static void mergeSortRecursiveByFirstName(Employee[] employees, int left, int right) {
         // Base case: if the subarray has 0 or 1 elements, it's already sorted
@@ -440,13 +345,12 @@ public class SortingAlgorithms {
     }
 
     /**
-     * Merges two sorted subarrays comparing by FIRST NAME.
-     * Same structure as merge() but uses compareEmployeesByFirstName.
+     * Merges two sorted subarrays (comparing by first name).
      *
      * @param employees The array containing both subarrays
-     * @param left      Starting index of the left subarray
-     * @param middle    Ending index of the left subarray
-     * @param right     Ending index of the right subarray
+     * @param left      Starting index
+     * @param middle    Middle index
+     * @param right     Ending index
      */
     private static void mergeByFirstName(Employee[] employees, int left, int middle, int right) {
         // Calculate sizes of the two subarrays to be merged
@@ -516,10 +420,21 @@ public class SortingAlgorithms {
         // Sort the employees by first name using Merge Sort
         Employee[] sortedEmployees = mergeSortByFirstName(employees);
 
+        // Count randomly generated employees
+        int randomCount = 0;
+        for (Employee emp : sortedEmployees) {
+            if (emp.isRandomlyGenerated()) {
+                randomCount++;
+            }
+        }
+
         // Display header with formatting
         System.out.println("\n========================================");
         System.out.println("SORTED EMPLOYEE LIST (First " + displayCount + ")");
-        System.out.println("Sorted by FIRST NAME");
+        System.out.println("Sorted by First Name");
+        if (randomCount > 0) {
+            System.out.println("Total Randomly Generated: " + randomCount);
+        }
         System.out.println("========================================");
 
         // Determine how many employees to display
@@ -529,9 +444,13 @@ public class SortingAlgorithms {
         for (int i = 0; i < countToDisplay; i++) {
             Employee emp = sortedEmployees[i];
 
+            // Add [RANDOM] tag for randomly generated employees
+            String randomTag = emp.isRandomlyGenerated() ? " [RANDOM]" : "";
+
             System.out.println((i + 1) + ". " + emp.getFullName() +
                     " - " + emp.getJobTitle() +
-                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")");
+                    " (" + (emp.getDepartment() != null ? emp.getDepartment().getDepartmentName() : "No Dept") + ")" +
+                    randomTag);
         }
 
         // Display footer with statistics
