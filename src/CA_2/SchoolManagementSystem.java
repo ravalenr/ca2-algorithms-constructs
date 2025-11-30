@@ -364,25 +364,11 @@ public class SchoolManagementSystem {
             return;
         }
 
-        // Ask user how they want to sort
-        System.out.println("\nHow would you like to sort employees?");
-        System.out.println("1. By Last Name (e.g., Anderson, Brown, Clark...)");
-        System.out.println("2. By First Name (e.g., Benjamin, Charles, Daniel...)");
-        System.out.print("Enter your choice (1 or 2): ");
-
-        int sortChoice = getUserMenuChoice();
-
         // Convert ArrayList to array for the sorting algorithm
         Employee[] employeeArray = employeeList.toArray(new Employee[0]);
 
-        // Use the appropriate sorting method based on user choice
-        if (sortChoice == 2) {
-            // Sort by FIRST NAME
-            SortingAlgorithms.sortByFirstNameAndDisplayFirst(employeeArray, 20);
-        } else {
-            // Sort by LAST NAME (default)
-            SortingAlgorithms.sortAndDisplayFirst(employeeArray, 20);
-        }
+        // Sort and display employees (sorted by first name)
+        SortingAlgorithms.sortAndDisplayFirst(employeeArray, 20);
     }
 
     private void handleSearchEmployee() {
@@ -568,7 +554,7 @@ public class SchoolManagementSystem {
         // No existing manager found, create a new one with a proper name
         Manager newManager = null;
 
-        // Generate a unique manager based on count to avoid name collisions
+        // Generate a unique manager based on count to avoid name repetitions
         int managerCount = managerList.size() + 1;
         String[] firstNames = {"Alexander", "Victoria", "Benjamin", "Catherine", "Nicholas", "Rupert", "Joyce"};
         String[] lastNames = {"Wright", "Scott", "Green", "Adams", "Baker", "Giles", "Summers"};

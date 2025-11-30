@@ -1,0 +1,47 @@
+classDiagram
+
+    class SchoolManagementSystem {
+        -ArrayList~Employee~ employeeList
+        +void handleSortEmployees()
+        +void handleSearchEmployee()
+    }
+
+    class SortingAlgorithms {
+        +mergeSort(Employee[])$ Employee[]
+        -mergeSortRecursive(arr, left, right)$
+        -merge(arr, left, mid, right)$
+        -compareEmployees(emp1, emp2)$ int
+    }
+
+    class SearchAlgorithms {
+        +linearSearch(Employee[], String)$ Employee[]
+        +searchAndDisplay(Employee[], String)$
+    }
+
+    class Database {
+        # String username
+        # String password
+        # String instance
+        + setQuery()
+        + getQuery()
+    }
+    class Employee {
+        -String firstName
+        -String lastName
+        -String employeeId
+        +String getFirstName()
+        +String getLastName()
+        +String getFullName()
+    }
+
+%% Interaction Dependencies
+    SchoolManagementSystem ..> SortingAlgorithms : calls mergeSort()
+    SchoolManagementSystem ..> SearchAlgorithms : calls linearSearch()
+    SortingAlgorithms ..> Employee : sorts & compares
+    SearchAlgorithms ..> Employee : searches & retrieves
+    Employee ..> Database : store & secure dataset
+
+    note for SchoolManagementSystem "Main control that manages user interactions and calls algorithm classes"
+
+    note for Database "To be implemented"
+    note for Employee "Data class representing employee records\nProvides getter methods for search & sort operations"

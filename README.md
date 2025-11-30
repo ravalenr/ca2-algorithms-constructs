@@ -14,9 +14,9 @@ This is a command-line School Management System built in Java as part of my inte
 
 The project demonstrates my understanding of:
 - Object-oriented programming with inheritance
-- Recursive sorting algorithms (Binary Tree Sort)
-- Efficient searching algorithms (Binary Search)
-- Data structures (Binary Trees)
+- Recursive sorting algorithms (Merge Sort)
+- Efficient searching algorithms (Linear Search)
+- Data structures and algorithms
 - File handling and data processing
 - Input validation and error handling
 
@@ -28,7 +28,8 @@ The School Management System allows users to:
 2. **Search for Employees** - Find specific employees and view their details including manager and department
 3. **Add New Employees** - Add new employee records with validation
 4. **Generate Random Data** - Create random employee records for testing
-5. **View Hierarchy** - Display the organizational structure as a binary tree
+5. **View Hierarchy** - Display the organizational structure showing managers and their departments
+6. **Department Statistics** - View department breakdown by category (Academic, Arts, Support, Administrative)
 
 ## Project Structure
 
@@ -57,14 +58,13 @@ ca2-algorithms-constructs/
 │   ├── DepartmentType.java            # Enum for department types
 │   ├── MenuOption.java                # Enum for menu options
 │   │
-│   ├── SortingAlgorithms.java        # Binary Tree Sort implementation
-│   ├── SearchAlgorithms.java         # Binary Search implementation
+│   ├── SortingAlgorithms.java        # Merge Sort implementation
+│   ├── SearchAlgorithms.java         # Linear Search implementation
 │   │
 │   └── SchoolManagementSystem.java   # Main application (to be completed)
 │
-├── docs/                              # Assignment documentation
-├── Applicants_Form - Sample data file for read.txt  # Sample data
-└── README.md                          # This file
+├── Applicants_Form.txt               # Sample data
+└── README.md                         # This file
 ```
 
 ## How to Run the Program
@@ -84,7 +84,7 @@ ca2-algorithms-constructs/
 
 
 ### Important Notes:
-- Make sure `Applicants_Form - Sample data file for read.txt` is in the project root directory
+- Make sure `Applicants_Form.txt` is in the project root directory
 - All classes must be in the `CA_2` package
 
 ## Key Features Explained
@@ -102,48 +102,53 @@ I used a three-level inheritance hierarchy to organize the code:
 **Department Hierarchy:**
 - `Department` (parent) → `AcademicDepartment`, `AdministrativeDepartment`, `SupportDepartment` (children)
 
-This structure follows the "DRY" (Don't Repeat Yourself) principle and makes the code more maintainable.
 
-### 2. Sorting Algorithm - Binary Tree Sort (Recursive)
+### 2. Sorting Algorithm - Merge Sort (Recursive)
 
-**Why I chose Binary Tree Sort:**
+**Why I chose Merge Sort:**
 
-I selected Binary Tree Sort as my recursive sorting algorithm for several important reasons:
+I selected Merge Sort as my recursive sorting algorithm for several important reasons:
 
-1. **Natural Integration** - The assignment requires both sorting AND displaying employee hierarchy as a binary tree. Binary Tree Sort naturally accomplishes both tasks, making it a logical choice.
+1. **Guaranteed Performance** - Merge Sort has O(n log n) time complexity in ALL cases (best, average, and worst), unlike Quick Sort which can degrade to O(n²). This ensures consistent performance regardless of input data patterns.
 
-2. **Efficient Performance** - Binary Tree Sort has an average time complexity of O(n log n), which is efficient for the dataset sizes we're working with (100+ employees). This meets the performance requirement of completing operations within 2-3 seconds.
+2. **Properly Recursive** - Merge Sort is a true divide-and-conquer recursive algorithm. It divides the problem into smaller subproblems, solves them recursively, then combines the results - perfectly demonstrating the recursive paradigm.
 
-3. **Recursive Nature** - The algorithm is inherently recursive through its insert operation, which perfectly fulfills the assignment requirement for a recursive sorting algorithm.
+3. **Stable Sorting** - Merge Sort is a stable sort, meaning employees with identical names maintain their original order. This is important for maintaining data integrity in employee records.
 
-4. **Intuitive for Hierarchies** - Since we're managing a school organization with natural hierarchical relationships (managers, departments, employees), a tree-based sorting approach makes conceptual sense.
+4. **Predictable Behavior** - The algorithm's performance is reliable and doesn't depend on pivot selection or data distribution, making it ideal for production systems.
 
-5. **Educational Value** - Binary Tree Sort demonstrates my understanding of both tree data structures and recursive algorithms, which are core topics in the Algorithms & Constructs module.
-
-**How it works:**
-1. Insert each employee into a Binary Search Tree (BST) using recursive insertion
-2. Perform an in-order traversal of the tree (also recursive)
-3. The in-order traversal naturally produces a sorted sequence
-
-The sorting is based on employee names (last name first, then first name) in alphabetical order.
-
-### 3. Searching Algorithm - Binary Search (Recursive)
-
-**Why I chose Binary Search:**
-
-Binary Search is the most efficient searching algorithm for sorted data:
-
-1. **Optimal Efficiency** - O(log n) time complexity means very fast searches even with large datasets
-2. **Perfect Match** - Since we're already sorting the data with Binary Tree Sort, Binary Search is the natural choice
-3. **Recursive Implementation** - The recursive nature divides the search space in half with each call
-4. **Performance Guarantee** - Easily meets the <1 second search requirement specified in the assignment
+5. **Educational Value** - Merge Sort demonstrates core algorithmic concepts: recursion, divide-and-conquer strategy, and the merge operation for combining sorted sequences.
 
 **How it works:**
-1. Takes a sorted array of employees
-2. Compares the search term with the middle element
-3. If match found, returns the employee
-4. If search term is less, searches the left half (recursively)
-5. If search term is greater, searches the right half (recursively)
+1. Divide the array into two halves (recursively)
+2. Sort each half independently using the same merge sort algorithm (recursive calls)
+3. Merge the two sorted halves back together into a single sorted array
+4. Base case: arrays with 0 or 1 elements are already sorted
+
+The sorting is based on employee names (last name first, then first name) in alphabetical order using case-insensitive comparison.
+
+### 3. Searching Algorithm - Linear Search
+
+**Why I chose Linear Search:**
+
+I selected Linear Search as my searching algorithm for several practical reasons:
+
+1. **Partial Name Matching** - Linear Search allows me to search for partial names (e.g., searching "buff" finds "Buffy Summers"). This makes the system much more user-friendly since people don't always remember full names.
+
+2. **Case-Insensitive Searching** - The implementation ignores case, making it easier for users to search without worrying about capitalization.
+
+3. **No Sorting Required** - Unlike Binary Search which requires sorted data, Linear Search works on any array. This means I can search immediately without having to sort first.
+
+4. **Real-World Performance** - With O(n) time complexity, it's fast enough for typical school sizes (50-500 employees). The search completes in well under a second for these dataset sizes.
+
+5. **Better User Experience** - While Binary Search is technically faster (O(log n)), it only works with exact matches. Linear Search provides a much better user experience by finding partial matches.
+
+**How it works:**
+1. Takes an array of employees and a search term
+2. Iterates through each employee in the array
+3. Compares the search term (case-insensitive) against first name, last name, and full name
+4. Checks if the search term is contained in any of these fields (partial matching)
+5. Returns all employees that match the search criteria
 
 The search is case-insensitive and returns complete employee details including Manager Type and Department.
 
@@ -194,7 +199,7 @@ The repository includes:
 - All source code files (.java)
 - Documentation (this README)
 - Sample data file
-- Regular commits showing development progress (10-15 commits as required)
+- Regular commits showing development progress
 
 ## Academic Integrity Statement
 

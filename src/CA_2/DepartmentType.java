@@ -1,17 +1,13 @@
 package CA_2;
 
 /**
- * DepartmentType enum defines the different types of departments in the school management system.
- * Using an enum provides type safety and ensures only valid department types can be assigned.
- *
- * Design Decision: Enums are used to enforce valid department classifications
- * and provide compile-time type checking for robust code.
+ * DepartmentType enum defines the types of departments in the school.
+ * Enums ensure only valid department types can be used.
  *
  * @author Rafael Valentim Ribeiro
  * @version 1.0
  */
 public enum DepartmentType {
-    // Enum constants representing different department types
     // Academic Departments
     SLAYER_STUDIES("Slayer Studies"),
     MAGIC_COMPUTATION("Magic & Computation"),
@@ -55,11 +51,6 @@ public enum DepartmentType {
         this.displayName = displayName;
     }
 
-    /**
-     * Returns the display name of this department type
-     *
-     * @return The display name as a String
-     */
     public String getDisplayName() {
         return displayName;
     }
