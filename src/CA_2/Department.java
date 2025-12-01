@@ -51,8 +51,8 @@ public abstract class Department {
         }
 
         String prefix = deptName.length() >= 3 ?
-                       deptName.substring(0, 3).toUpperCase() :
-                       deptName.toUpperCase();
+                deptName.substring(0, 3).toUpperCase() :
+                deptName.toUpperCase();
 
         return prefix + (int)(Math.random() * 1000);
     }
@@ -80,4 +80,20 @@ public abstract class Department {
     public String getDepartmentTypeString() { return departmentType != null ? departmentType.getDisplayName() : "Unknown"; }
 
     public void setDepartmentHead(Manager departmentHead) { this.departmentHead = departmentHead; }
+
+    // need to override equals so department comparisons work correctly
+    // otherwise it just compares memory addresses which doesnt work
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Department other = (Department) obj;
+        // compare by ID since each department should have unique ID
+        return departmentId != null && departmentId.equals(other.departmentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return departmentId != null ? departmentId.hashCode() : 0;
+    }
 }

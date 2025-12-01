@@ -45,7 +45,7 @@ public class Employee {
      * Constructor with parameters
      */
     public Employee(String firstName, String lastName, String gender, String email,
-                   double salary, String position, String jobTitle, String company) {
+                    double salary, String position, String jobTitle, String company) {
         this.employeeId = generateEmployeeId(firstName, lastName);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -69,8 +69,8 @@ public class Employee {
             return "EMP" + (int)(Math.random() * 10000);
         }
         String id = firstName.substring(0, 1).toUpperCase() +
-                   lastName.toUpperCase() +
-                   (int)(Math.random() * 1000);
+                lastName.toUpperCase() +
+                (int)(Math.random() * 1000);
         return id;
     }
 
@@ -87,6 +87,11 @@ public class Employee {
 
     public void setManager(Manager manager) { this.manager = manager; }
     public void setDepartment(Department department) { this.department = department; }
+
+    // needed for marking randomly generated employees
+    public void setRandomlyGenerated(boolean value) {
+        this.isRandomlyGenerated = value;
+    }
 
     /**
      * Displays employee information

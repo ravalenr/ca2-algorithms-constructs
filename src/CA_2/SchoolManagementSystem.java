@@ -4,13 +4,16 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 
 /**
  * SchoolManagementSystem is the main application for managing school employee records.
  * Provides a menu-based interface for sorting, searching, and managing employees.
+ *
+ * Uses helper classes to keep code organized:
+ * - ManagerCreator: handles manager creation
+ * - RandomEmployeeGenerator: generates random employees
+ * - DepartmentReporter: displays department statistics
  *
  * @author Rafael Valentim Ribeiro
  * @version 1.0
@@ -18,18 +21,25 @@ import java.util.Set;
 public class SchoolManagementSystem {
 
     private ArrayList<Employee> employeeList;
-
     private ArrayList<Manager> managerList;
-
     private ArrayList<Department> departmentList;
-
     private Scanner scanner;
+
+    // helper classes to organize code
+    private ManagerCreator managerCreator;
+    private RandomEmployeeGenerator randomGenerator;
+    private DepartmentReporter departmentReporter;
 
     public SchoolManagementSystem() {
         this.employeeList = new ArrayList<>();
         this.managerList = new ArrayList<>();
         this.departmentList = new ArrayList<>();
         this.scanner = new Scanner(System.in);
+
+        // create helper classes
+        this.managerCreator = new ManagerCreator(employeeList, managerList, departmentList);
+        this.randomGenerator = new RandomEmployeeGenerator(employeeList, managerList, departmentList, managerCreator);
+        this.departmentReporter = new DepartmentReporter(employeeList, departmentList);
     }
 
     /**
@@ -194,9 +204,29 @@ public class SchoolManagementSystem {
                     String jobTitle = data[7].trim();
                     String company = data[8].trim();
 
-                    // Create Employee object (will be Teacher for this school system)
-                    Employee employee = new Teacher(firstName, lastName, gender, email,
-                            salary, position, jobTitle, company);
+                    // Create the right type of employee based on position field from CSV
+                    // BUG FIX: was creating everyone as Teacher before which was wrong!
+                    Employee employee;
+
+                    // check position column to see if this person is a manager type
+                    if (position.equalsIgnoreCase("Principal")) {
+                        employee = new Principal(firstName, lastName, gender, email,
+                                salary, position, jobTitle, company);
+                        managerList.add((Manager) employee);
+                    } else if (position.equalsIgnoreCase("DeputyPrincipal") ||
+                            position.equalsIgnoreCase("Deputy Principal")) {
+                        employee = new VicePrincipal(firstName, lastName, gender, email,
+                                salary, position, jobTitle, company);
+                        managerList.add((Manager) employee);
+                    } else if (position.equalsIgnoreCase("DepartmentHead")) {
+                        employee = new DepartmentHead(firstName, lastName, gender, email,
+                                salary, position, jobTitle, company);
+                        managerList.add((Manager) employee);
+                    } else {
+                        // regular employee, create as Teacher
+                        employee = new Teacher(firstName, lastName, gender, email,
+                                salary, position, jobTitle, company);
+                    }
 
                     // Add to employee list
                     employeeList.add(employee);
@@ -210,14 +240,14 @@ public class SchoolManagementSystem {
                 }
             }
 
-            // Create core management structure (Principal, Vice Principal, Dean, Academic Coordinator)
-            ensureCoreManagementExists();
+            // Create core management structure using helper class
+            managerCreator.ensureCoreManagementExists();
 
             // Create Department Heads for each department
-            createDepartmentHeads();
+            managerCreator.createDepartmentHeads();
 
             // Assign managers to employees based on department
-            assignManagersToEmployees();
+            managerCreator.assignManagersToEmployees();
 
             // Display loading statistics
             System.out.println("File read successfully!");
@@ -265,93 +295,6 @@ public class SchoolManagementSystem {
         departmentList.add(newDept);
 
         return newDept;
-    }
-
-    private void createDepartmentHeads() {
-        // Names for department heads
-        String[] headFirstNames = {"Willow", "Xander", "Cordelia", "Oz", "Faith",
-                                  "Wesley", "Anya", "Tara", "Dawn", "Andrew",
-                                  "Kennedy", "Jonathan", "Harmony", "Amy", "Larry"};
-        String[] headLastNames = {"Rosenberg", "Harris", "Chase", "Osbourne", "Lehane",
-                                 "Wyndam-Pryce", "Jenkins", "Maclay", "Summers", "Wells",
-                                 "Unknown", "Levinson", "Kendall", "Madison", "Blaisdell"};
-
-        int headIndex = 0;
-
-        // Create one Department Head for each department (excluding Senior Management which has school-wide managers)
-        for (Department dept : departmentList) {
-            String deptName = dept.getDepartmentName();
-
-            // Skip Senior Management as it already has the Principal, Vice Principal, Dean, and Academic Coordinator
-            if (deptName.equalsIgnoreCase("Senior Management")) {
-                continue;
-            }
-
-            // Check if this department already has a Department Head
-            boolean hasHead = false;
-            for (Manager m : managerList) {
-                if (m.getManagerType() == ManagerType.DEPARTMENT_HEAD &&
-                    m.getDepartment() != null &&
-                    m.getDepartment().equals(dept)) {
-                    hasHead = true;
-                    break;
-                }
-            }
-
-            if (!hasHead) {
-                // Create Department Head
-                String firstName = headFirstNames[headIndex % headFirstNames.length];
-                String lastName = headLastNames[headIndex % headLastNames.length];
-                headIndex++;
-
-                DepartmentHead manager = new DepartmentHead(firstName, lastName, "Male",
-                        firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.com",
-                        65000.0, "senior", "Department Head of " + deptName, "School");
-
-                // Assign department to manager
-                manager.setDepartment(dept);
-                dept.addStaff(manager);
-                dept.setDepartmentHead(manager);
-
-                // Add to lists
-                managerList.add(manager);
-                employeeList.add(manager);
-            }
-        }
-    }
-
-    private void assignManagersToEmployees() {
-        for (Employee emp : employeeList) {
-            // Skip if already a manager or already has a manager assigned
-            if (emp instanceof Manager || emp.getManager() != null) {
-                continue;
-            }
-
-            // Find a manager in the same department
-            Manager assignedManager = findManagerForEmployee(emp);
-            if (assignedManager != null) {
-                assignedManager.addEmployee(emp);
-            }
-        }
-    }
-
-    private Manager findManagerForEmployee(Employee employee) {
-        Department empDept = employee.getDepartment();
-
-        // First, try to find a manager in the same department
-        for (Manager manager : managerList) {
-            if (manager.getDepartment() != null &&
-                    manager.getDepartment().equals(empDept)) {
-                return manager;
-            }
-        }
-
-        // If no manager in same department, assign to first available manager
-        if (!managerList.isEmpty()) {
-            return managerList.get(0);
-        }
-
-        return null;
     }
 
     private void handleSortEmployees() {
@@ -474,8 +417,8 @@ public class SchoolManagementSystem {
         newEmployee.setDepartment(dept);
         dept.addStaff(newEmployee);
 
-        // Find an appropriate manager for this department
-        Manager assignedManager = findManagerForEmployee(newEmployee);
+        // Find an appropriate manager for this department using helper
+        Manager assignedManager = managerCreator.findManagerForEmployee(newEmployee);
         if (assignedManager != null) {
             assignedManager.addEmployee(newEmployee);
         }
@@ -491,7 +434,7 @@ public class SchoolManagementSystem {
         System.out.println();
         System.out.println("Assigned Manager: " +
                 (assignedManager != null ? assignedManager.getFullName() + " (" +
-                assignedManager.getManagerTypeString() + ")" : "None"));
+                        assignedManager.getManagerTypeString() + ")" : "None"));
         System.out.println("========================================\n");
 
         // Display the newly added employee details
@@ -523,146 +466,6 @@ public class SchoolManagementSystem {
         }
     }
 
-    private Manager findOrCreateManager(ManagerType managerType, Department department) {
-        // School-wide unique positions: Principal, Vice Principal, Dean, Academic Coordinator
-        // Only ONE of each should exist across the entire school
-        if (managerType == ManagerType.PRINCIPAL ||
-            managerType == ManagerType.VICE_PRINCIPAL ||
-            managerType == ManagerType.DEPUTY_PRINCIPAL ||
-            managerType == ManagerType.DEAN ||
-            managerType == ManagerType.ACADEMIC_COORDINATOR) {
-
-            // Check if this manager type already exists (globally, not per department)
-            for (Manager manager : managerList) {
-                if (manager.getManagerType() == managerType) {
-                    // Found existing school-wide manager, assign this employee to them
-                    return manager;
-                }
-            }
-        } else if (managerType == ManagerType.DEPARTMENT_HEAD) {
-            // Department Heads are unique PER department
-            // Check if this department already has a Department Head
-            for (Manager manager : managerList) {
-                if (manager.getManagerType() == ManagerType.DEPARTMENT_HEAD &&
-                        manager.getDepartment() != null &&
-                        manager.getDepartment().equals(department)) {
-                    return manager;
-                }
-            }
-        }
-
-        // No existing manager found, create a new one with a proper name
-        Manager newManager = null;
-
-        // Generate a unique manager based on count to avoid name repetitions
-        int managerCount = managerList.size() + 1;
-        String[] firstNames = {"Alexander", "Victoria", "Benjamin", "Catherine", "Nicholas", "Rupert", "Joyce"};
-        String[] lastNames = {"Wright", "Scott", "Green", "Adams", "Baker", "Giles", "Summers"};
-
-        String firstName = firstNames[managerCount % firstNames.length];
-        String lastName = lastNames[managerCount % lastNames.length];
-        String email = firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.com";
-
-        // Create appropriate Manager subclass based on type
-        if (managerType == ManagerType.PRINCIPAL) {
-            newManager = new Principal(firstName, lastName, "Male", email,
-                    80000.0, "senior", "Principal", "School");
-        } else if (managerType == ManagerType.VICE_PRINCIPAL || managerType == ManagerType.DEPUTY_PRINCIPAL) {
-            newManager = new VicePrincipal(firstName, lastName, "Female", email,
-                    70000.0, "senior", "Vice Principal", "School");
-        } else if (managerType == ManagerType.DEAN) {
-            newManager = new DepartmentHead(firstName, lastName, "Male", email,
-                    65000.0, "senior", "Dean of Students", "School");
-        } else if (managerType == ManagerType.ACADEMIC_COORDINATOR) {
-            newManager = new DepartmentHead(firstName, lastName, "Female", email,
-                    60000.0, "senior", "Academic Coordinator", "School");
-        } else {
-            // DEPARTMENT_HEAD or default
-            newManager = new DepartmentHead(firstName, lastName, "Male", email,
-                    60000.0, "senior", "Department Head of " + department.getDepartmentName(), "School");
-        }
-
-        // Add to lists
-        managerList.add(newManager);
-        employeeList.add(newManager);
-
-        // For Department Heads, assign to specific department
-        // For school-wide managers (Principal, Vice Principal, Dean, Academic Coordinator),
-        // assign to the first department they encounter (but they manage school-wide)
-        if (managerType == ManagerType.DEPARTMENT_HEAD) {
-            newManager.setDepartment(department);
-            department.addStaff(newManager);
-        } else {
-            // School-wide managers: assign to first department encountered
-            if (newManager.getDepartment() == null) {
-                newManager.setDepartment(department);
-                department.addStaff(newManager);
-            }
-        }
-
-        return newManager;
-    }
-
-    private void ensureCoreManagementExists() {
-        // Check if Principal exists, if not create one
-        boolean hasPrincipal = false;
-        boolean hasVicePrincipal = false;
-        boolean hasDean = false;
-        boolean hasAcademicCoordinator = false;
-
-        for (Manager m : managerList) {
-            if (m.getManagerType() == ManagerType.PRINCIPAL) hasPrincipal = true;
-            if (m.getManagerType() == ManagerType.VICE_PRINCIPAL) hasVicePrincipal = true;
-            if (m.getManagerType() == ManagerType.DEAN) hasDean = true;
-            if (m.getManagerType() == ManagerType.ACADEMIC_COORDINATOR) hasAcademicCoordinator = true;
-        }
-
-        // Create a default department for school-wide managers if needed
-        Department defaultDept = findOrCreateDepartment("Senior Management");
-
-        // Create Principal if doesn't exist
-        if (!hasPrincipal) {
-            Principal principal = new Principal("Principal", "Snyder", "Male",
-                "principal.snyder@sunnydalehs.com", 90000.0, "senior", "School Principal", "School");
-            principal.setDepartment(defaultDept);
-            defaultDept.addStaff(principal);
-            managerList.add(principal);
-            employeeList.add(principal);
-        }
-
-        // Create Vice Principal if doesn't exist
-        if (!hasVicePrincipal) {
-            VicePrincipal vicePrincipal = new VicePrincipal("Robin", "Wood", "Male",
-                "robin.wood@sunnydalehs.com", 75000.0, "senior", "Vice Principal", "School");
-            vicePrincipal.setDepartment(defaultDept);
-            defaultDept.addStaff(vicePrincipal);
-            managerList.add(vicePrincipal);
-            employeeList.add(vicePrincipal);
-        }
-
-        // Create Dean if doesn't exist
-        if (!hasDean) {
-            DepartmentHead dean = new DepartmentHead("Jenny", "Calendar", "Female",
-                "jenny.calendar@sunnydalehs.com", 70000.0, "senior", "Dean of Students", "School");
-            dean.managerType = ManagerType.DEAN;
-            dean.setDepartment(defaultDept);
-            defaultDept.addStaff(dean);
-            managerList.add(dean);
-            employeeList.add(dean);
-        }
-
-        // Create Academic Coordinator if doesn't exist
-        if (!hasAcademicCoordinator) {
-            DepartmentHead coordinator = new DepartmentHead("Rupert", "Giles", "Male",
-                "rupert.giles@sunnydalehs.com", 68000.0, "senior", "Academic Coordinator", "School");
-            coordinator.managerType = ManagerType.ACADEMIC_COORDINATOR;
-            coordinator.setDepartment(defaultDept);
-            defaultDept.addStaff(coordinator);
-            managerList.add(coordinator);
-            employeeList.add(coordinator);
-        }
-    }
-
     private void handleGenerateRandomEmployees() {
         System.out.println("\n>>> GENERATE RANDOM EMPLOYEES option selected");
 
@@ -670,116 +473,11 @@ public class SchoolManagementSystem {
         System.out.print("How many random employees would you like to generate? ");
         int count = getUserMenuChoice();
 
+        // use helper class to generate employees
+        int generatedCount = randomGenerator.generateRandomEmployees(count);
 
-        // Validate used emails to guarantee uniqueness
-        Set<String> usedEmails = new HashSet<>();
-        for (Employee e : employeeList) {
-            if (e.getEmail() != null) {
-                usedEmails.add(e.getEmail().toLowerCase());
-            }
-        }
-
-
-        // Validate input range
-        if (count <= 0 || count > 1000) {
-            System.out.println("Invalid count. Please enter a number between 1 and 1000.");
-            return;
-        }
-
-        // Arrays of sample data for random generation
-        String[] firstNames = {
-            "John", "Jane", "Michael", "Sarah", "David", "Emily",
-            "Robert", "Lisa", "James", "Mary", "William", "Patricia",
-            "Richard", "Jennifer", "Thomas", "Linda", "Charles", "Elizabeth",
-            "Daniel", "Susan", "Matthew", "Karen", "Anthony", "Nancy",
-            "Mark", "Betty", "Donald", "Helen", "Steven", "Sandra"
-        };
-
-        String[] lastNames = {
-            "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia",
-            "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez",
-            "Wilson", "Anderson", "Taylor", "Thomas", "Moore", "Jackson",
-            "Martin", "Lee", "Thompson", "White", "Harris", "Clark",
-            "Lewis", "Robinson", "Walker", "Young", "Allen", "King"
-        };
-
-        String[] genders = {"Male", "Female"};
-
-        String[] positions = {"senior", "middle", "junior", "intern", "contract"};
-
-        // School-appropriate job titles
-        String[] jobTitles = {
-            "Teacher", "Assistant Teacher", "Counselor", "Librarian",
-            "Lab Technician", "School Nurse", "Administrator", "Coordinator",
-            "Specialist", "Support Staff", "Custodian", "Security Guard"
-        };
-
-        // Get available department types from enum
-        DepartmentType[] departmentTypes = DepartmentType.values();
-
-        // Create core school management structure first
-        // This ensures having ONE Principal, ONE Vice Principal, ONE Dean, ONE Academic Coordinator
-        ensureCoreManagementExists();
-
-        System.out.println("\nGenerating " + count + " random employees...\n");
-
-        int generatedCount = 0;
-
-        // Generate the specified number of random employees
-        for (int i = 0; i < count; i++) {
-
-            String firstName;
-            String lastName;
-            String gender;
-            String email;
-
-            // Keep trying until get a unique email
-            int safetyCounter = 0;
-            do {
-                firstName = firstNames[(int) (Math.random() * firstNames.length)];
-                lastName  = lastNames[(int) (Math.random() * lastNames.length)];
-                gender    = genders[(int) (Math.random() * genders.length)];
-                email     = firstName.toLowerCase() + "." + lastName.toLowerCase() + "@sunnydalehs.com";
-
-                safetyCounter++;
-                // Safety break
-                if (safetyCounter > 1000) {
-                    System.out.println("WARNING: Could not generate unique email, skipping remaining employees.");
-                    return;
-                }
-            } while (usedEmails.contains(email.toLowerCase()));
-
-            usedEmails.add(email.toLowerCase());
-
-            // Then generate the rest normally
-            double salary   = 25000 + (Math.random() * 75000);
-            String position = positions[(int) (Math.random() * positions.length)];
-            String jobTitle = jobTitles[(int) (Math.random() * jobTitles.length)];
-
-            DepartmentType randomDeptType = departmentTypes[(int) (Math.random() * departmentTypes.length)];
-
-            Employee newEmployee = new Teacher(firstName, lastName, gender, email,
-                    salary, position, jobTitle, "School");
-
-            Department dept = findOrCreateDepartment(randomDeptType.getDisplayName());
-            newEmployee.setDepartment(dept);
-            dept.addStaff(newEmployee);
-
-            Manager assignedManager = findManagerForEmployee(newEmployee);
-            if (assignedManager != null) {
-                assignedManager.addEmployee(newEmployee);
-            }
-
-            employeeList.add(newEmployee);
-            generatedCount++;
-        }
-
-
-        // Display generation statistics
-        System.out.println("========================================");
-        System.out.println("Successfully generated " + generatedCount + " random employees!");
-        System.out.println("Total employees in system: " + employeeList.size());
-        System.out.println("========================================\n");
+        // display stats
+        randomGenerator.displayGenerationStats(generatedCount);
 
         // Display all employees to show the newly generated ones
         System.out.println("Displaying all employees (including newly generated):\n");
@@ -803,7 +501,7 @@ public class SchoolManagementSystem {
 
         System.out.println("========================================");
         System.out.println("ALL EMPLOYEES (" + sortedEmployees.length + " total)");
-        System.out.println("Sorted alphabetically by last name");
+        System.out.println("Sorted alphabetically by first name");
         System.out.println("========================================");
 
         // Display each employee with their details
@@ -827,166 +525,33 @@ public class SchoolManagementSystem {
             return;
         }
 
-        // Display organizational hierarchy
-        System.out.println("========================================");
-        System.out.println("SCHOOL ORGANIZATIONAL HIERARCHY");
-        System.out.println("========================================");
-        System.out.println();
-        System.out.println("MANAGEMENT STRUCTURE:");
-        System.out.println("----------------------------------------");
-
-        // Display managers by type
-        for (Manager manager : managerList) {
-            System.out.println(manager.getManagerTypeString() + ": " +
-                             manager.getFullName());
-            System.out.println("  Department: " +
-                             (manager.getDepartment() != null ?
-                              manager.getDepartment().getDepartmentName() : "Not assigned"));
-            System.out.println("  Employees Managed: " + manager.getEmployeeCount());
+        // Check if we have minimum 20 employees as per requirements
+        if (employeeList.size() < 20) {
+            System.out.println("WARNING: The system requires minimum 20 employee records.");
+            System.out.println("Current records: " + employeeList.size());
+            System.out.println("Please add more employees using option 3 or 4.");
             System.out.println();
         }
 
-        System.out.println("========================================");
-        System.out.println("SYSTEM STATISTICS:");
-        System.out.println("----------------------------------------");
-        System.out.println("Total employees: " + employeeList.size());
-        System.out.println("Total managers: " + managerList.size());
-        System.out.println("Total departments: " + departmentList.size());
-        System.out.println("========================================\n");
+        // Create a new binary tree for the employee hierarchy
+        EmployeeHierarchyTree hierarchyTree = new EmployeeHierarchyTree();
+
+        // Build the tree from the employee list using level-order insertion
+        System.out.println("Building employee hierarchy binary tree...");
+        System.out.println("Using level-order (breadth-first) insertion method.");
+        System.out.println();
+
+        // Insert all employees into the tree
+        hierarchyTree.buildFromList(employeeList);
+
+        // Display the tree with level-order traversal
+        hierarchyTree.displayTreeSummary();
     }
 
     private void handleDepartmentStatistics() {
         System.out.println("\n>>> DEPARTMENT STATISTICS REPORT option selected");
 
-        if (departmentList.isEmpty()) {
-            System.out.println("No departments to display.");
-            System.out.println("Please load data or generate employees first.");
-            return;
-        }
-
-        System.out.println("\n========================================");
-        System.out.println("DEPARTMENT STATISTICS REPORT");
-        System.out.println("========================================\n");
-
-        // Group departments by category
-        System.out.println("ACADEMIC DEPARTMENTS:");
-        System.out.println("----------------------------------------");
-        int academicCount = 0;
-        int academicStaff = 0;
-        for (Department dept : departmentList) {
-            DepartmentType type = dept.departmentType;
-            if (type == DepartmentType.SLAYER_STUDIES || type == DepartmentType.MAGIC_COMPUTATION ||
-                type == DepartmentType.MATHEMATICS || type == DepartmentType.SCIENCE ||
-                type == DepartmentType.ENGLISH || type == DepartmentType.MODERN_LANGUAGES ||
-                type == DepartmentType.GEOGRAPHY || type == DepartmentType.HISTORY ||
-                type == DepartmentType.COMPUTER_SCIENCE || type == DepartmentType.PHYSICAL_EDUCATION) {
-
-                int staffCount = getStaffCountForDepartment(dept);
-                System.out.println("  " + dept.getDepartmentName() + ": " + staffCount + " staff");
-                academicCount++;
-                academicStaff += staffCount;
-            }
-        }
-        System.out.println("  Total Academic Departments: " + academicCount);
-        System.out.println("  Total Academic Staff: " + academicStaff);
-        System.out.println();
-
-        // Arts and Performance
-        System.out.println("ARTS & PERFORMANCE DEPARTMENTS:");
-        System.out.println("----------------------------------------");
-        int artsCount = 0;
-        int artsStaff = 0;
-        for (Department dept : departmentList) {
-            DepartmentType type = dept.departmentType;
-            if (type == DepartmentType.PERFORMING_ARTS || type == DepartmentType.DRAMA ||
-                type == DepartmentType.MUSIC || type == DepartmentType.ART) {
-
-                int staffCount = getStaffCountForDepartment(dept);
-                System.out.println("  " + dept.getDepartmentName() + ": " + staffCount + " staff");
-                artsCount++;
-                artsStaff += staffCount;
-            }
-        }
-        System.out.println("  Total Arts Departments: " + artsCount);
-        System.out.println("  Total Arts Staff: " + artsStaff);
-        System.out.println();
-
-        // Student Support Services
-        System.out.println("STUDENT SUPPORT SERVICES:");
-        System.out.println("----------------------------------------");
-        int supportCount = 0;
-        int supportStaff = 0;
-        for (Department dept : departmentList) {
-            DepartmentType type = dept.departmentType;
-            if (type == DepartmentType.LIBRARY || type == DepartmentType.GUIDANCE ||
-                type == DepartmentType.STUDENT_SUPPORT || type == DepartmentType.NURSING) {
-
-                int staffCount = getStaffCountForDepartment(dept);
-                System.out.println("  " + dept.getDepartmentName() + ": " + staffCount + " staff");
-                supportCount++;
-                supportStaff += staffCount;
-            }
-        }
-        System.out.println("  Total Support Departments: " + supportCount);
-        System.out.println("  Total Support Staff: " + supportStaff);
-        System.out.println();
-
-        // Administrative and Operations
-        System.out.println("ADMINISTRATIVE & OPERATIONS:");
-        System.out.println("----------------------------------------");
-        int adminCount = 0;
-        int adminStaff = 0;
-        for (Department dept : departmentList) {
-            DepartmentType type = dept.departmentType;
-            if (type == DepartmentType.SENIOR_MANAGEMENT || type == DepartmentType.FINANCE_ADMINISTRATION ||
-                type == DepartmentType.RECEPTION || type == DepartmentType.LEGAL ||
-                type == DepartmentType.FACILITIES || type == DepartmentType.SECURITY ||
-                type == DepartmentType.IT_SUPPORT || type == DepartmentType.MECHANICS ||
-                type == DepartmentType.CANTEEN) {
-
-                int staffCount = getStaffCountForDepartment(dept);
-                System.out.println("  " + dept.getDepartmentName() + ": " + staffCount + " staff");
-                adminCount++;
-                adminStaff += staffCount;
-            }
-        }
-        System.out.println("  Total Admin/Operations Departments: " + adminCount);
-        System.out.println("  Total Admin/Operations Staff: " + adminStaff);
-        System.out.println();
-
-        // Overall Summary
-        System.out.println("========================================");
-        System.out.println("OVERALL SUMMARY:");
-        System.out.println("----------------------------------------");
-        System.out.println("Total Departments: " + departmentList.size());
-        System.out.println("Total Staff: " + employeeList.size());
-        System.out.println("Average Staff per Department: " +
-                          (departmentList.size() > 0 ? employeeList.size() / departmentList.size() : 0));
-
-        // Find largest department
-        Department largest = null;
-        int maxStaff = 0;
-        for (Department dept : departmentList) {
-            int staffCount = getStaffCountForDepartment(dept);
-            if (staffCount > maxStaff) {
-                maxStaff = staffCount;
-                largest = dept;
-            }
-        }
-        if (largest != null) {
-            System.out.println("Largest Department: " + largest.getDepartmentName() +
-                              " (" + maxStaff + " staff)");
-        }
-        System.out.println("========================================\n");
-    }
-
-    private int getStaffCountForDepartment(Department dept) {
-        int count = 0;
-        for (Employee emp : employeeList) {
-            if (emp.getDepartment() != null && emp.getDepartment().equals(dept)) {
-                count++;
-            }
-        }
-        return count;
+        // use helper class to display department statistics
+        departmentReporter.displayDepartmentStatistics();
     }
 }
